@@ -2,6 +2,7 @@ datagovsg
 =========
 
 .. image:: https://img.shields.io/github/license/yuhui/datagovsg
+.. image:: https://readthedocs.org/projects/datagovsg/badge/?version=latest   :alt: Documentation Status   :target: https://datagovsg.readthedocs.io/en/latest/?badge=latest
 
 This is an unofficial Python package for interacting with APIs available at `Data.gov.sg`_.
 
@@ -22,6 +23,10 @@ The main steps are:
 1. Import a class.
 2. Instantiate an object from the class.
 3. Call a function on that object.
+
+For more information, `refer to the documentation`_.
+
+.. _refer to the documentation: http://datagovsg.readthedocs.io/
 
 Usage overview
 ^^^^^^^^^^^^^^
