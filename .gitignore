@@ -107,6 +107,3 @@ venv.bak/
 
 # VSCode
 /.vscode
-
-# Secrets
-secrets.py

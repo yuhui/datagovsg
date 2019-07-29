@@ -18,10 +18,12 @@ import nox
 def tests(session):
     """Run unit tests and generate coverage."""
     session.install('-r', 'requirements.txt')
+    session.install('coverage')
     session.install('pytest')
     session.install('pytest-cov')
     session.run(
         'pytest',
+        '--cov=./',
         '--cov-config=.coveragerc',
         '--cov-report=term-missing',
     )
