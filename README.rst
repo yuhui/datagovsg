@@ -1,6 +1,9 @@
 datagovsg
 =========
 
+.. image:: https://img.shields.io/pypi/pyversions/datagovsg
+.. image:: https://img.shields.io/pypi/v/datagovsg
+.. image:: https://img.shields.io/pypi/status/datagovsg
 .. image:: https://img.shields.io/github/license/yuhui/datagovsg
 .. image:: https://readthedocs.org/projects/datagovsg/badge/?version=latest   :alt: Documentation Status   :target: https://datagovsg.readthedocs.io/en/latest/?badge=latest
 
