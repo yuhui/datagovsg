@@ -67,8 +67,8 @@ classifiers = [
 
 setup(
     name=name,
-    version='{}.{}'.format(version, timestamp), # TestPyPi
-    #version=version, # PyPi
+    #version='{}.{}'.format(version, timestamp), # TestPyPi
+    version=version, # PyPi
 
     packages=find_packages(exclude=exclude_packages),
     install_requires=requirements,
