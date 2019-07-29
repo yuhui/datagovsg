@@ -6,8 +6,6 @@ python:
       - requirements: requirements_docs.txt
       - method: pip
         path: .
-      - method: setuptools
-        path: package
 
 sphinx:
   builder: html
