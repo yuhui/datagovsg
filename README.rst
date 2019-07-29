@@ -1,11 +1,21 @@
 datagovsg
 =========
 
-.. image:: https://img.shields.io/pypi/pyversions/datagovsg
-.. image:: https://img.shields.io/pypi/v/datagovsg
-.. image:: https://img.shields.io/pypi/status/datagovsg
-.. image:: https://img.shields.io/github/license/yuhui/datagovsg
-.. image:: https://readthedocs.org/projects/datagovsg/badge/?version=latest   :alt: Documentation Status   :target: https://datagovsg.readthedocs.io/en/latest/?badge=latest
+|pyversions| |pypi| |status| |license| |readthedocs|
+
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/datagovsg
+   :alt: Python 3
+.. |pypi| image:: https://img.shields.io/pypi/v/datagovsg
+   :alt: PyPi
+   :target: https://pypi.org/project/datagovsg
+.. |status| image:: https://img.shields.io/pypi/status/datagovsg
+   :alt: PyPi status
+.. |license| image:: https://img.shields.io/github/license/yuhui/datagovsg
+   :alt: GNU General Public License v3.0
+   :target: https://www.gnu.org/licenses/gpl-3.0.html
+.. |readthedocs| image:: https://readthedocs.org/projects/datagovsg/badge/?version=latest
+   :alt: Documentation Status
+   :target: https://datagovsg.readthedocs.io/en/latest/?badge=latest
 
 This is an unofficial Python package for interacting with APIs available at `Data.gov.sg`_.
 
