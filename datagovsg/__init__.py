@@ -13,7 +13,7 @@
 # limitations under the License.
 
 name = 'datagovsg'
-version = '1.0'
+version = '1.0.0'
 author = 'Yuhui'
 author_email = 'yuhuibc@gmail.com'
 

@@ -20,7 +20,7 @@ timestamp = now.strftime('%Y%m%d%H%M%S')
 
 from datagovsg import name, version, author, author_email
 
-release_status = 'Development Status :: 4 - Beta'
+release_status = 'Development Status :: 5 - Production/Stable'
 packages = [
     'datagovsg',
 ]
