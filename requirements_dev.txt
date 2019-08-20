@@ -2,4 +2,5 @@
 codecov
 nox
 pylint
+pytest
 twine
