@@ -14,7 +14,12 @@
 
 """Constants for all CKAN-related APIs."""
 
-from datagovsg.constants import *
+from ..constants import (
+    BASE_CKAN_DOMAIN,
+    BASE_CKAN_ENDPOINT,
+    CACHE_MAXSIZE,
+    CACHE_ONE_DAY,
+)
 
 DATASOURCE_SEARCH_CKAN_ENDPOINT = '{}/datastore_search'.format(
     BASE_CKAN_ENDPOINT,

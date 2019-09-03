@@ -14,7 +14,11 @@
 
 """Constants for all Traffic-related APIs."""
 
-from datagovsg.constants import *
+from ..constants import (
+    BASE_API_ENDPOINT,
+    CACHE_MAXSIZE,
+    CACHE_ONE_MINUTE,
+)
 
 TRANSPORT_API_ENDPOINT = '{}/transport'.format(BASE_API_ENDPOINT)
 CARPARK_AVAILABILITY_API_ENDPOINT = '{}/carpark-availability'.format(

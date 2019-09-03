@@ -16,9 +16,9 @@
 
 from cachetools import cached, TTLCache
 
-from datagovsg import net
-from datagovsg.ckan.constants import *
-from datagovsg.client import __Client
+from .constants import *
+from .. import net
+from ..client import __Client
 
 class Client(__Client):
     """Interact with CKAN software to access its catalogue of datasets."""

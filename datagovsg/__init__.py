@@ -13,14 +13,14 @@
 # limitations under the License.
 
 name = 'datagovsg'
-version = '1.0.1'
+version = '1.0.2'
 author = 'Yuhui'
 author_email = 'yuhuibc@gmail.com'
 
-from datagovsg.ckan import Client as Ckan
-from datagovsg.environment import Client as Environment
-from datagovsg.technology import Client as Technology
-from datagovsg.transport import Client as Transport
+from .ckan import Client as Ckan
+from .environment import Client as Environment
+from .technology import Client as Technology
+from .transport import Client as Transport
 
 __all__ = [
     'Ckan',

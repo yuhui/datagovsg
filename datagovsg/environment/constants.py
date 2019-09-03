@@ -14,7 +14,15 @@
 
 """Constants for all Environment-related APIs."""
 
-from datagovsg.constants import *
+from ..constants import (
+    BASE_API_ENDPOINT,
+    CACHE_FIVE_MINUTES,
+    CACHE_MAXSIZE,
+    CACHE_ONE_HOUR,
+    CACHE_ONE_MINUTE,
+    CACHE_THIRTY_MINUTES,
+    CACHE_TWELVE_HOURS,
+)
 
 ENVIRONMENT_API_ENDPOINT = '{}/environment'.format(BASE_API_ENDPOINT)
 AIR_TEMPERATURE_API_ENDPOINT = '{}/air-temperature'.format(

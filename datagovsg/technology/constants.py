@@ -14,7 +14,11 @@
 
 """Constants for all Technology-related APIs."""
 
-from datagovsg.constants import *
+from ..constants import (
+    BASE_API_ENDPOINT,
+    CACHE_MAXSIZE,
+    CACHE_ONE_DAY,
+)
 
 TECHNOLOGY_API_ENDPOINT = '{}/technology'.format(BASE_API_ENDPOINT)
 

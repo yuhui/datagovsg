@@ -18,8 +18,8 @@ import backoff
 import requests
 from datetime import date, datetime
 
-from datagovsg import timezone
-from datagovsg.exceptions import APIError
+from . import timezone
+from .exceptions import APIError
 
 ACCEPT_TYPES = [
     'json',

@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datagovsg.transport.client import Client
+from .client import Client
