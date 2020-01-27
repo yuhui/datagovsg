@@ -69,4 +69,4 @@ This project is licensed under the GNU General Public License v3.0.
 Logo
 ----
 
-The logo is copyright by the Governent of Singapore. It is used for reference only. This project's owner does not have any copyright claim over it.
+The logo is copyright by the Government of Singapore. It is used for reference only. This project's owner does not have any copyright claim over it.
