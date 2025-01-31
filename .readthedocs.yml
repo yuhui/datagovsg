@@ -1,7 +1,11 @@
 version: 2
 
+build:
+  os: ubuntu-lts-latest
+  tools:
+    python: latest
+
 python:
-   version: 3.7
    install:
       - requirements: requirements_docs.txt
       - method: pip
