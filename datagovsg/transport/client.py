@@ -14,21 +14,18 @@
 
 """Client for interacting with the Transport APIs."""
 
-from cachetools import cached, TTLCache
 from ..constants import CACHE_THIRTY_SECONDS, CACHE_ONE_MINUTE
+from ..datagovsg import DataGovSg
 
-from .. import net
-from ..client import __Client
 from .constants import (
     CARPARK_AVAILABILITY_API_ENDPOINT,
     TAXI_AVAILABILITY_API_ENDPOINT,
     TRAFFIC_IMAGES_API_ENDPOINT,
 )
 
-class Client(__Client):
+class Client(DataGovSg):
     """Interact with the transport-related endpoints."""
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
     def carpark_availability(self, date_time=None):
         """Get the latest carpark availability in Singapore.
 
@@ -44,14 +41,17 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/carpark-availability
         """
-        carpark_availabilities = net.send_request(
+        params = self.build_params(kwargs)
+
+        carpark_availabilities = self.send_request(
             CARPARK_AVAILABILITY_API_ENDPOINT,
-            date_time=date_time,
+            params=params,
+            cache_duration=CACHE_ONE_MINUTE,
+            sanitise_numbers=True,
         )
 
         return carpark_availabilities
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
     def taxi_availability(self, date_time=None):
         """Get locations of available taxis in Singapore.
 
@@ -67,15 +67,16 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/taxi-availability
         """
-        taxi_availabilities = net.send_request(
+        params = self.build_params(kwargs)
+
+        taxi_availabilities = self.send_request(
             TAXI_AVAILABILITY_API_ENDPOINT,
-            accept_type='vnd.geo+json',
-            date_time=date_time,
+            params=params,
+            cache_duration=CACHE_THIRTY_SECONDS,
         )
 
         return taxi_availabilities
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
     def traffic_images(self, date_time=None):
         """Get the latest images from traffic cameras all around Singapore.
 
@@ -91,9 +92,12 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/traffic-images
         """
-        traffic_images = net.send_request(
+        params = self.build_params(kwargs)
+
+        traffic_images = self.send_request(
             TRAFFIC_IMAGES_API_ENDPOINT,
-            date_time=date_time,
+            params=params,
+            cache_duration=CACHE_ONE_MINUTE,
         )
 
         return traffic_images

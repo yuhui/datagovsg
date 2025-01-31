@@ -17,8 +17,8 @@
 BASE_V1_API_ENDPOINT = 'https://api.data.gov.sg/v1'
 BASE_V2_API_ENDPOINT = 'https://api-open.data.gov.sg/v2/real-time/api'
 
+CACHE_NAME = 'datagovsg_cache'
 
-CACHE_MAXSIZE = 1024
 CACHE_THIRTY_SECONDS = 30
 CACHE_ONE_MINUTE = CACHE_THIRTY_SECONDS * 2
 CACHE_FIVE_MINUTES = CACHE_ONE_MINUTE * 5
@@ -27,9 +27,13 @@ CACHE_ONE_HOUR = CACHE_ONE_MINUTE * 60
 CACHE_TWELVE_HOURS = CACHE_ONE_HOUR * 12
 CACHE_ONE_DAY = CACHE_ONE_HOUR * 24
 
+USER_AGENT = 'Data.gov.sg Python package/2.0.0 https://pypi.org/project/datagovsg'
+
 __all__ = [
     'BASE_V1_API_ENDPOINT',
     'BASE_V2_API_ENDPOINT',
+
+    'CACHE_NAME',
 
     'CACHE_THIRTY_SECONDS',
     'CACHE_ONE_MINUTE',
@@ -38,4 +42,6 @@ __all__ = [
     'CACHE_ONE_HOUR',
     'CACHE_TWELVE_HOURS',
     'CACHE_ONE_DAY',
+
+    'USER_AGENT',
 ]

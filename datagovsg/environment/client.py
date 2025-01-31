@@ -14,11 +14,8 @@
 
 """Client for interacting with the Environment APIs."""
 
-from cachetools import cached, TTLCache
-from datetime import date, datetime
+from urllib.parse import urlencode
 
-from .. import net
-from ..client import __Client
 from ..constants import (
     CACHE_ONE_MINUTE,
     CACHE_FIVE_MINUTES,
@@ -26,6 +23,7 @@ from ..constants import (
     CACHE_ONE_HOUR,
     CACHE_TWELVE_HOURS,
 )
+from ..datagovsg import DataGovSg
 from .constants import (
     AIR_TEMPERATURE_API_ENDPOINT,
     FOUR_DAY_WEATHER_FORECAST_API_ENDPOINT,
@@ -40,10 +38,9 @@ from .constants import (
     WIND_SPEED_API_ENDPOINT,
 )
 
-class Client(__Client):
+class Client(DataGovSg):
     """Interact with the environment-related endpoints."""
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
     def air_temperature(self, date_time=None, dt=None):
         """Get air temperature readings across Singapore.
 
@@ -64,20 +61,17 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=17494bed-23e9-4b3b-ae89-232f87987163
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-       }
-        kwargs = self.prepare_kwargs(kwargs)
 
-        air_temperature = net.send_request(
+        params = self.build_params(kwargs)
+
+        air_temperature = self.__collect_environment_data(
             AIR_TEMPERATURE_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_ONE_MINUTE,
         )
 
         return air_temperature
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_HOUR))
     def pm25(self, date_time=None, dt=None):
         """Retrieve the latest PM2.5 information in Singapore.
 
@@ -98,20 +92,16 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/pm2-5
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
+        params = self.build_params(kwargs)
 
-        pm25_information = net.send_request(
+        pm25_information = self.__collect_environment_data(
             PM25_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_ONE_HOUR,
         )
 
         return pm25_information
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_HOUR))
     def psi(self, date_time=None, dt=None):
         """Retrieve the latest PSI information in Singapore.
 
@@ -132,20 +122,17 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/psi
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
 
-        psi_information = net.send_request(
+        params = self.build_params(kwargs)
+
+        psi_information = self.__collect_environment_data(
             PSI_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_ONE_HOUR,
         )
 
         return psi_information
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_FIVE_MINUTES))
     def rainfall(self, date_time=None, dt=None):
         """Get rainfall readings across Singapore.
 
@@ -166,20 +153,17 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=8bd37e06-cdd7-4ca4-9ad8-5754eb70a33d
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
 
-        rainfall = net.send_request(
+        params = self.build_params(kwargs)
+
+        rainfall = self.__collect_environment_data(
             RAINFALL_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_FIVE_MINUTES,
         )
 
         return rainfall
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
     def relative_humidity(self, date_time=None, dt=None):
         """Get relative humidity readings across Singapore.
 
@@ -200,20 +184,17 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=59eb2883-2ceb-4d16-85f0-7e3a3176ef46
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
 
-        relative_humidity = net.send_request(
+        params = self.build_params(kwargs)
+
+        relative_humidity = self.__collect_environment_data(
             RELATIVE_HUMIDITY_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_ONE_MINUTE,
         )
 
         return relative_humidity
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_HOUR))
     def uv_index(self, date_time=None):
         """Retrieve the latest UV index information in Singapore.
 
@@ -228,14 +209,16 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/ultraviolet-index-uvi
         """
-        uv_index_information = net.send_request(
+        params = self.build_params(kwargs)
+
+        uv_index_information = self.__collect_environment_data(
             UV_INDEX_API_ENDPOINT,
-            date_time=date_time,
+            params=params,
+            cache_duration=CACHE_ONE_HOUR,
         )
 
         return uv_index_information
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_THIRTY_MINUTES))
     def two_hour_weather_forecast(self, date_time=None, dt=None):
         """Retrieve the latest two hour weather forecast across Singapore.
 
@@ -256,20 +239,17 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/weather-forecast?resource_id=571ef5fb-ed31-48b2-85c9-61677de42ca9
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
 
-        two_hour_weather_forecast = net.send_request(
+        params = self.build_params(kwargs)
+
+        two_hour_weather_forecast = self.__collect_environment_data(
             TWO_HOUR_WEATHER_FORECAST_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_THIRTY_MINUTES,
         )
 
         return two_hour_weather_forecast
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_HOUR))
     def twenty_four_hour_weather_forecast(self, date_time=None, dt=None):
         """Retrieve the latest 24 hour weather forecast across Singapore.
 
@@ -290,20 +270,17 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/weather-forecast?resource_id=9a8bd97e-0e38-46b7-bc39-9a2cb4a53a62
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
 
-        twenty_four_hour_weather_forecast = net.send_request(
+        params = self.build_params(kwargs)
+
+        twenty_four_hour_weather_forecast = self.__collect_environment_data(
             TWENTY_FOUR_HOUR_WEATHER_FORECAST_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_ONE_HOUR,
         )
 
         return twenty_four_hour_weather_forecast
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_TWELVE_HOURS))
     def four_day_weather_forecast(self, date_time=None, dt=None):
         """Retrieve the latest 4 day weather forecast.
 
@@ -324,20 +301,16 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/weather-forecast?resource_id=4df6d890-f23e-47f0-add1-fd6d580447d1
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
+        params = self.build_params(kwargs)
 
-        four_day_weather_forecast = net.send_request(
+        four_day_weather_forecast = self.__collect_environment_data(
             FOUR_DAY_WEATHER_FORECAST_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_TWELVE_HOURS,
         )
 
         return four_day_weather_forecast
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
     def wind_direction(self, date_time=None, dt=None):
         """Get wind direction readings across Singapore.
 
@@ -358,20 +331,15 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=5dcf8aa5-cf6a-44e4-b359-1173eecfdf4c
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
 
-        wind_direction = net.send_request(
+        wind_direction = self.__collect_environment_data(
             WIND_DIRECTION_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_ONE_MINUTE,
         )
 
         return wind_direction
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
     def wind_speed(self, date_time=None, dt=None):
         """Get wind speed readings across Singapore.
 
@@ -392,18 +360,102 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=16035f22-37b4-4a5c-b024-ca2381f11b48
         """
-        kwargs = {
-            'date_time': date_time,
-            'date': dt,
-        }
-        kwargs = self.prepare_kwargs(kwargs)
+        params = self.build_params(kwargs)
 
-        wind_speed = net.send_request(
+        wind_speed = self.__collect_environment_data(
             WIND_SPEED_API_ENDPOINT,
-            **kwargs,
+            params=params,
+            cache_duration=CACHE_ONE_MINUTE,
         )
 
         return wind_speed
+
+    # private
+
+    def __collect_environment_data(
+        self,
+        url: Url,
+        params: dict,
+        cache_duration: int,
+    ) -> Any:
+        """Get environment data from the specified endpoint URL.
+
+        If there are pages of 'readings' data, then compiles all of those \
+            pages into one big list.
+
+        (Since this method has to call `send_request()`, so the parameters \
+            are similar to that method's.)
+
+        :param url: The endpoint URL to send the request to.
+        :type url: Url
+
+        :param params: List of parameters to be passed to the endpoint URL.
+        :type params: dict
+
+        :param cache_duration: Number of seconds before the cache expires.
+        :type cache_duration: int
+
+        :return: data from the endpoint, compiling all pages of readings.
+        :rtype: Any (but really a dict)
+        """
+        params_str = urlencode(params, safe=':+')
+        response = self.send_request(
+            url,
+            params=params_str,
+            cache_duration=cache_duration,
+        )
+
+        if 'data' not in response:
+            error_message = 'Unexpected error occurred'
+            if 'errorMsg' in response:
+                error_message = response['errorMsg']
+            raise APIError(error_message, response)
+
+        data = response['data']
+
+        if 'paginationToken' in data:
+            pagination_token = data.pop('paginationToken')
+
+            # Collect the next page of data and append it to this one
+            params['paginationToken'] = pagination_token
+            response_data = self.__collect_environment_data(
+                url,
+                params=params,
+                cache_duration=cache_duration,
+            )
+
+            data_items_name = ''
+            if 'items' in data and 'items' in response_data:
+                data_items_name = 'items'
+            elif 'readings' in data and 'readings' in response_data:
+                data_items_name = 'readings'
+            elif 'records' in data and 'records' in response_data:
+                data_items_name = 'records'
+            if data_items_name != '':
+                data[data_items_name].extend(response_data[data_items_name])
+
+            # Merge and keep unique values
+            data_centre_name = ''
+            data_centre_field = ''
+            if 'area_metadata' in data and 'area_metadata' in response_data:
+                data_centre_name = 'area_metadata'
+                data_centre_field = 'name'
+            elif 'regionMetadata' in data and 'regionMetadata' in response_data:
+                data_centre_name = 'regionMetadata'
+                data_centre_field = 'name'
+            elif 'stations' in data and 'stations' in response_data:
+                data_centre_name = 'stations'
+                data_centre_field = 'id'
+            if data_centre_name != '' and data_centre_field != '':
+                centres = [
+                    centre[data_centre_field] \
+                        for centre in data[data_centre_name]
+                ]
+                for centre in response_data[data_centre_name]:
+                    if centre[data_centre_field] not in centres:
+                        data[data_centre_name].append(centre)
+
+        return data
 
 __all__ = [
     'Client',

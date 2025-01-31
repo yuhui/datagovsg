@@ -14,11 +14,9 @@
 
 """Client for interacting with the Technology APIs."""
 
-from cachetools import cached, TTLCache
 
-from .. import net
-from ..client import __Client
 from ..constants import CACHE_TWELVE_HOURS
+from ..datagovsg import DataGovSg
 
 from .constants import (
     IPOS_DESIGNS_API_ENDPOINT,
@@ -26,10 +24,9 @@ from .constants import (
     IPOS_TRADEMARKS_API_ENDPOINT,
 )
 
-class Client(__Client):
+class Client(DataGovSg):
     """Interact with the technology-related endpoints."""
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_DAY))
     def designs(self, date=None):
         """Get design applications lodged with IPOS in Singapore.
 
@@ -45,14 +42,16 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/ipos-apis?resource_id=adf6222f-955b-4a76-892f-802a396844a1
         """
-        lodged_designs = net.send_request(
+        params = self.build_params(kwargs)
+
+        lodged_designs = self.send_request(
             IPOS_DESIGNS_API_ENDPOINT,
-            lodgement_date=date,
+            params=params,
+            cache_duration=CACHE_TWELVE_HOURS,
         )
 
         return lodged_designs
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_DAY))
     def patents(self, date=None):
         """Get patent applications lodged with IPOS in Singapore.
 
@@ -68,14 +67,16 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/ipos-apis?resource_id=6a030bf2-22da-4621-8ab0-9a5956a30ef3
         """
-        lodged_patents = net.send_request(
+        params = self.build_params(kwargs)
+
+        lodged_patents = self.send_request(
             IPOS_PATENTS_API_ENDPOINT,
-            lodgement_date=date,
+            params=params,
+            cache_duration=CACHE_TWELVE_HOURS,
         )
 
         return lodged_patents
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_DAY))
     def trademarks(self, date=None):
         """Get trademark applications lodged with IPOS in Singapore.
 
@@ -91,9 +92,12 @@ class Client(__Client):
         References:
             https://data.gov.sg/dataset/ipos-apis?resource_id=1522db0e-808b-48ea-9869-fe5adc566585
         """
-        lodged_trademarks = net.send_request(
+        params = self.build_params(kwargs)
+
+        lodged_trademarks = self.send_request(
             IPOS_TRADEMARKS_API_ENDPOINT,
-            lodgement_date=date,
+            params=params,
+            cache_duration=CACHE_TWELVE_HOURS,
         )
 
         return lodged_trademarks
