@@ -27,6 +27,7 @@ from ..constants import (
     CACHE_TWELVE_HOURS,
 )
 from ..datagovsg import DataGovSg
+from ..exceptions import APIError
 from ..types import Url
 
 from .constants import (

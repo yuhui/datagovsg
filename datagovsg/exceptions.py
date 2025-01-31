@@ -31,10 +31,13 @@ class APIError(Exception):
     def __init__(
         self,
         message: str,
+        data: Optional[Any]=None,
         errors: Optional[Any]=None,
     ) -> None:
         super().__init__(message)
         self.message = message
+        if data:
+            self.data = data
         if errors:
             self.errors = errors
 
