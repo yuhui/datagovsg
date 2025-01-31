@@ -8,7 +8,18 @@ directories.)
 
 .. _Data.gov.sg: https://data.gov.sg
 
-The four clients are: ``Ckan``, ``Environment``, ``Technology`` and ``Transport``.
+The four clients are: ``Economy``, ``Environment``, ``Housing`` and
+``Transport``.
+
+    *Breaking changes from v1.x*
+
+    The ``Economy`` client used to be called ``Technology``.
+
+    The old ``Transport`` client has been separated into ``Housing`` and
+    ``Transport``.
+
+    `Data.gov.sg`_ no longer provides endpoints for CKAN, so the ``Ckan``
+    client has been deprecated.
 
 Each client contains several public functions, one function per endpoint. A
 function's name is the same as its corresponding endpoint's ending path.
@@ -18,8 +29,8 @@ parameter that the endpoint accepts.
 
     *Why have separate clients instead of one single client?*
 
-    Without knowing how `Data.gov.sg`_'s API will evolve, and noticing that the
-    endpoints were themselves already partitioned into "sets", it seemed like a
+    Without knowing how `Data.gov.sg`_'s API will evolve, and noticing that
+    Data.gov.sg uses "Categories" to group its endpoints, it seemed like a
     good idea to keep each set of endpoints in its own contextual client. This
     allows for each "set" of endpoints to be customised on their own, e.g. the
     ``Environment`` endpoints allow for either a date or date-time to be

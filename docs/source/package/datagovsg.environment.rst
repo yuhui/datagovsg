@@ -18,3 +18,12 @@ Methods
 .. autoclass:: Client
    :members:
    :show-inheritance:
+
+Types
+-----
+
+.. toctree::
+   :maxdepth: 1
+
+   datagovsg.environment.types_args
+   datagovsg.environment.types

@@ -1,7 +1,8 @@
 datagovsg.ckan
 ==============
 
-.. automodule:: datagovsg.ckan.client
+.. automodule:: datagovsg.ckan
+    :deprecated:
 
 Example usage:
 

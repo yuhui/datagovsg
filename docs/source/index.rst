@@ -3,10 +3,10 @@
    contain the root `toctree` directive.
 
 
-datagovsg: interact with Data.gov.sg's API
+datagovsg: Interact with Data.gov.sg's API
 ==========================================
 
-Release v\ |version|.
+Release v\ |release|.
 
 |pyversions| |pypi| |status| |license| |readthedocs|
 
@@ -49,18 +49,12 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    package_overview
    package_reference
    external_references
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   other_packages
 
 License
 -------

@@ -7,10 +7,10 @@ Example usage:
 
 .. code-block:: python
 
-    # get the list of available car park spaces
+    # get the list of available taxis
     from datagovsg import Transport
     transport = Transport()
-    carpark_availability = transport.carpark_availability()
+    taxi_availability = transport.taxi_availability()
 
 Methods
 -------
@@ -18,3 +18,12 @@ Methods
 .. autoclass:: Client
    :members:
    :show-inheritance:
+
+Types
+-----
+
+.. toctree::
+   :maxdepth: 1
+
+   datagovsg.transport.types_args
+   datagovsg.transport.types
