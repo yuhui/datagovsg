@@ -18,6 +18,9 @@ from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 def datetime_as_sgt(dt):
+DATE_FORMAT = '%Y-%m-%d'
+TIME_FORMAT = '%H:%M:%S'
+
     """Set a datetime with the SGT timezone and return the datetime.
 
     Raises:
@@ -35,24 +38,57 @@ def datetime_from_string(val):
         ValueError:
             Raised if `val` is not in a valid datetime format.
     """
-    # first, try parsing without time
-    dt_format = '%Y-%m-%d'
+    # try parsing without time
     try:
+        dt_format = DATE_FORMAT
         dt = datetime.strptime(val, dt_format)
-    except:
-        # next, try parsing without timezone
-        dt_format = '{} %H:%M:%S'.format(dt_format)
+    except ValueError:
+        # try parsing without timezone
         try:
+            dt_format = f'{DATE_FORMAT} {TIME_FORMAT}'
             dt = datetime.strptime(val, dt_format)
-        except:
-            # last, try parsing with timezone
-            dt_format = '{}%z'.format(dt_format)
-            dt = datetime.strptime(val, dt_format)
-    # if still getting an error, then this isn't a datetime string
+        except ValueError:
+            # try parsing without timezone with "T"
+            try:
+                dt_format = f'{DATE_FORMAT}T{TIME_FORMAT}'
+                dt = datetime.strptime(val, dt_format)
+            except ValueError:
+                # try parsing with timezone
+                try:
+                    dt_format = f'{DATE_FORMAT} {TIME_FORMAT}%z'
+                    dt = datetime.strptime(val, dt_format)
+                except ValueError:
+                    # try parsing with timezone with "T"
+                    try:
+                        dt_format = f'{DATE_FORMAT}T{TIME_FORMAT}%z'
+                        dt = datetime.strptime(val, dt_format)
+                    except ValueError:
+                        # try parsing without timezone with microseconds
+                        try:
+                            dt_format = f'{DATE_FORMAT} {TIME_FORMAT}.%f'
+                            dt = datetime.strptime(val, dt_format)
+                        except ValueError:
+                            # try parsing without timezone with microseconds and "T"
+                            try:
+                                dt_format = f'{DATE_FORMAT}T{TIME_FORMAT}.%f'
+                                dt = datetime.strptime(val, dt_format)
+                            except ValueError:
+                                # try parsing with timezone and microseconds
+                                try:
+                                    dt_format = f'{DATE_FORMAT} {TIME_FORMAT}.%f%z'
+                                    dt = datetime.strptime(val, dt_format)
+                                except ValueError:
+                                    # try parsing with timezone and microseconds and "T"
+                                    try:
+                                        dt_format = f'{DATE_FORMAT}T{TIME_FORMAT}.%f%z'
+                                        dt = datetime.strptime(val, dt_format)
+                                    except ValueError as e:
+                                        # still getting an error, this isn't a datetime string
+                                        raise ValueError('val is not a datetime string') from e
 
     dt = datetime_as_sgt(dt)
 
-    if dt_format is '%Y-%m-%d':
+    if dt_format == DATE_FORMAT:
         # the original string was just the date, so return a date object only
         dt = dt.date()
 
