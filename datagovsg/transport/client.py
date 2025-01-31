@@ -34,7 +34,11 @@ from .types import (
 )
 
 class Client(DataGovSg):
-    """Interact with the transport-related endpoints."""
+    """Interact with the transport-related endpoints.
+
+    Reference: \
+        https://data.gov.sg/datasets?formats=API&topics=transport
+    """
 
     @typechecked
     def carpark_availability(
@@ -43,17 +47,14 @@ class Client(DataGovSg):
     ) -> CarparkAvailabilityDict:
         """Get the latest carpark availability in Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the availabilities
-                at that time.
-                Can be in any timezone (will be standardised to SGT.)
+        Retrieved every minute.
 
-        Returns:
-            (dict) Available carpark spaces.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: TransportArgsDict
 
-        References:
-            https://data.gov.sg/dataset/carpark-availability
+        :return: Available carpark spaces. (Cached for 1 minute.)
+        :rtype: CarparkAvailabilityDict
         """
         carpark_availability: CarparkAvailabilityDict
 
@@ -75,17 +76,14 @@ class Client(DataGovSg):
     ) -> TaxiAvailabilityDict:
         """Get locations of available taxis in Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the availabilities
-                at that time.
-                Can be in any timezone (will be standardised to SGT.)
+        Retrieved every 30 seconds from LTA's Datamall.
 
-        Returns:
-            (dict) GeoJSON of the taxi availabilities.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: TransportArgsDict
 
-        References:
-            https://data.gov.sg/dataset/taxi-availability
+        :return: GeoJSON of the taxi availabilities. (Cached for 30 seconds.)
+        :rtype: TaxiAvailabilityDict
         """
         taxi_availability: TaxiAvailabilityDict
 
@@ -106,17 +104,15 @@ class Client(DataGovSg):
     ) -> TrafficImagesDict:
         """Get the latest images from traffic cameras all around Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the images
-                at that time.
-                Can be in any timezone (will be standardised to SGT.)
+        Retrieved every 20 seconds from LTA's Datamall. But it is recommended \
+            to retrieve the data every minute.
 
-        Returns:
-            (dict) Images from traffic cameras.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: TransportArgsDict
 
-        References:
-            https://data.gov.sg/dataset/traffic-images
+        :return: Images from traffic cameras. (Cached for 1 minute.)
+        :rtype: TrafficImagesDict
         """
         traffic_images: TrafficImagesDict
 

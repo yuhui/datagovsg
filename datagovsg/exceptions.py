@@ -22,11 +22,16 @@ from typeguard import typechecked
 class APIError(Exception):
     """Error when the API returns an error.
 
-    Attributes:
-        message (str):
-            The general error message to display when the error is raised.
-        errors (list of str):
-            (optional) Other messages that were part of the raised error.
+    :param message: The general error message to display when the error is \
+        raised.
+    :type message: str
+
+    :param data: Data response obtained by the calling method. Defaults to None.
+    :type data: Any
+
+    :param errors: Other messages that were part of the raised error. \
+        Defaults to None.
+    :type message: Any
     """
     def __init__(
         self,
@@ -34,6 +39,7 @@ class APIError(Exception):
         data: Optional[Any]=None,
         errors: Optional[Any]=None,
     ) -> None:
+        """Constructor method"""
         super().__init__(message)
         self.message = message
         if data:

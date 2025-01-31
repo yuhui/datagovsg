@@ -26,22 +26,27 @@ TIME_FORMAT = '%H:%M:%S'
 def datetime_as_sgt(dt: datetime) -> datetime:
     """Set a datetime with the SGT timezone and return the datetime.
 
-    Raises:
-        AssertionError:
-            Raised if `dt` is not of datetime class.
+    :param dt: Datetime to convert to SGT timezone.
+    :type dt: datetime
+
+    :return: The datetime in SGT timezone.
+    :rtype: datetime
     """
     dt_sg: datetime = dt.astimezone(ZoneInfo('Asia/Singapore'))
     return dt_sg
 
 @typechecked
 def datetime_from_string(val: str) -> datetime | date:
+    """Convert a YYYY-MM-DDTHH:MM:SS string into a datetime and return the \
+    datetime.
 
-    """Convert a YYYY-MM-DDTHH:MM:SS string into a datetime
-    and return the datetime.
+    :param val: String to convert to a datetime.
+    :type val: str
 
-    Raises:
-        ValueError:
-            Raised if `val` is not in a valid datetime format.
+    :raises ValueError: "val" is not a recognised datetime string.
+
+    :return: The value as a datetime or date, if there is no time.
+    :rtype: datetime | date
     """
     dt: datetime | date
 

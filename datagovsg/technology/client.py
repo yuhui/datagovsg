@@ -34,23 +34,24 @@ from .types import (
 )
 
 class Client(DataGovSg):
-    """Interact with the technology-related endpoints."""
+    """Interact with the technology-related endpoints.
+
+    Reference: \
+        https://data.gov.sg/datasets?formats=API&topics=technology
+    """
 
     @typechecked
     def designs(self, **kwargs: Unpack[TechnologyArgsDict]) -> DesignsDict:
         """Get design applications lodged with IPOS in Singapore.
 
-        Arguments:
-            date (date):
-                (optional) Specific date to retrieve the lodged designs
-                on that date.
-                Can be in any timezone (will be standardised to SGT.)
+        Updated daily from IPOS.
 
-        Returns:
-            (dict) Design applications that have been lodged.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: TechnologyArgsDict
 
-        References:
-            https://data.gov.sg/dataset/ipos-apis?resource_id=adf6222f-955b-4a76-892f-802a396844a1
+        :return: Design application information. (Cached for 12 hours.)
+        :rtype: DesignsDict
         """
         designs: DesignsDict
 
@@ -68,17 +69,14 @@ class Client(DataGovSg):
     def patents(self, **kwargs: Unpack[TechnologyArgsDict]) -> PatentsDict:
         """Get patent applications lodged with IPOS in Singapore.
 
-        Arguments:
-            date (date):
-                (optional) Specific date to retrieve the lodged patents
-                on that date.
-                Can be in any timezone (will be standardised to SGT.)
+        Updated daily from IPOS.
 
-        Returns:
-            (dict) Patent applications that have been lodged.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: TechnologyArgsDict
 
-        References:
-            https://data.gov.sg/dataset/ipos-apis?resource_id=6a030bf2-22da-4621-8ab0-9a5956a30ef3
+        :return: Patent application information. (Cached for 12 hours.)
+        :rtype: PatentsDict
         """
         patents: PatentsDict
 
@@ -96,17 +94,14 @@ class Client(DataGovSg):
     def trademarks(self, **kwargs: Unpack[TechnologyArgsDict]) -> TrademarksDict:
         """Get trademark applications lodged with IPOS in Singapore.
 
-        Arguments:
-            date (date):
-                (optional) Specific date to retrieve the lodged trademarks
-                on that date.
-                Can be in any timezone (will be standardised to SGT.)
+        Updated daily from IPOS.
 
-        Returns:
-            (dict) Trademark applications that have been lodged.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: TechnologyArgsDict
 
-        References:
-            https://data.gov.sg/dataset/ipos-apis?resource_id=1522db0e-808b-48ea-9869-fe5adc566585
+        :return: Trademark application information. (Cached for 12 hours.)
+        :rtype: TrademarksDict
         """
         trademarks: TrademarksDict
 

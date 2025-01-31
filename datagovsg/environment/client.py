@@ -55,7 +55,11 @@ from .types import (
 )
 
 class Client(DataGovSg):
-    """Interact with the environment-related endpoints."""
+    """Interact with the environment-related endpoints.
+
+    Reference: \
+        https://data.gov.sg/datasets?formats=API&topics=environment
+    """
 
     @typechecked
     def air_temperature(
@@ -64,22 +68,14 @@ class Client(DataGovSg):
     ) -> EnvironmentReadingDict:
         """Get air temperature readings across Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Has per-minute readings from NEA.
 
-        Returns:
-            (dict) Readings of air temperature by station.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/realtime-weather-readings?resource_id=17494bed-23e9-4b3b-ae89-232f87987163
+        :return: Air Temperature Information. (Cached for 1 minute.)
+        :rtype: EnvironmentReadingDict
         """
         air_temperature: EnvironmentReadingDict
 
@@ -97,22 +93,14 @@ class Client(DataGovSg):
     def pm25(self, **kwargs: Unpack[EnvironmentArgsDict]) -> PM25Dict:
         """Retrieve the latest PM2.5 information in Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Updated hourly from NEA.
 
-        Returns:
-            (dict) Readings of PM2.5 by region.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/pm2-5
+        :return: PM 2.5 Information. (Cached for 1 hour.)
+        :rtype: PM25Dict
         """
         pm25: PM25Dict
 
@@ -130,22 +118,14 @@ class Client(DataGovSg):
     def psi(self, **kwargs: Unpack[EnvironmentArgsDict]) -> PSIDict:
         """Retrieve the latest PSI information in Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Updated hourly from NEA.
 
-        Returns:
-            (dict) Readings of PSI by region.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/psi
+        :return: PSI Information. (Cached for 1 hour.)
+        :rtype: PSIDict
         """
         psi: PSIDict
 
@@ -166,22 +146,14 @@ class Client(DataGovSg):
     ) -> EnvironmentReadingDict:
         """Get rainfall readings across Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        5-minute readings from NEA.
 
-        Returns:
-            (dict) Readings of rainfall by station.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/realtime-weather-readings?resource_id=8bd37e06-cdd7-4ca4-9ad8-5754eb70a33d
+        :return: Rainfall Information. (Cached for 5 minutes.)
+        :rtype: EnvironmentReadingDict
         """
         rainfall: EnvironmentReadingDict
 
@@ -200,24 +172,16 @@ class Client(DataGovSg):
         self,
         **kwargs: Unpack[EnvironmentArgsDict],
     ) -> EnvironmentReadingDict:
-        """Get relative humidity readings across Singapore.
+        """Get relative humidity readings.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Has per-minute readings from NEA.
 
-        Returns:
-            (dict) Readings of relative humidity by station.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/realtime-weather-readings?resource_id=59eb2883-2ceb-4d16-85f0-7e3a3176ef46
+        :return: Relative Humidity Information. (Cached for 1 minute.)
+        :rtype: EnvironmentReadingDict
         """
         relative_humidity: EnvironmentReadingDict
 
@@ -235,16 +199,15 @@ class Client(DataGovSg):
     def uv_index(self, **kwargs: Unpack[EnvironmentArgsDict]) -> UVIndexDict:
         """Retrieve the latest UV index information in Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
+        Updated every hour between 7 AM and 7 PM everyday. The UV index value \
+            is averaged over the preceding hour.
 
-        Returns:
-            (dict) Readings of UV Index by station.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/ultraviolet-index-uvi
+        :return: UV Index Information. (Cached for 1 hour.)
+        :rtype: UVIndexDict
         """
         uv_index: UVIndexDict
 
@@ -263,24 +226,16 @@ class Client(DataGovSg):
         self,
         **kwargs: Unpack[EnvironmentArgsDict],
     ) -> WeatherForecastTwoHourDict:
-        """Retrieve the latest two hour weather forecast across Singapore.
+        """Retrieve the latest two hour weather forecast.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Updated half-hourly from NEA.
 
-        Returns:
-            (dict) Weather forecast for the next 2 hours by area.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/weather-forecast?resource_id=571ef5fb-ed31-48b2-85c9-61677de42ca9
+        :return: 2 Hour Weather Forecast. (Cached for 30 minutes.)
+        :rtype: WeatherForecastTwoHourDict
         """
         two_hour_weather_forecast: WeatherForecastTwoHourDict
 
@@ -299,24 +254,16 @@ class Client(DataGovSg):
         self,
         **kwargs: Unpack[EnvironmentArgsDict],
     ) -> WeatherForecastTwentyFourHourDict:
-        """Retrieve the latest 24 hour weather forecast across Singapore.
+        """Retrieve the latest 24 hour weather forecast.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Updated multiple times throughout the day.
 
-        Returns:
-            (dict) Weather forecast for the next 24 hours by area.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/weather-forecast?resource_id=9a8bd97e-0e38-46b7-bc39-9a2cb4a53a62
+        :return: 24 Hour Weather Forecast. (Cached for 1 hour.)
+        :rtype: WeatherForecastTwentyFourHourDict
         """
         twenty_four_hour_weather_forecast: WeatherForecastTwentyFourHourDict
 
@@ -337,22 +284,14 @@ class Client(DataGovSg):
     ) -> WeatherForecastFourDayDict:
         """Retrieve the latest 4 day weather forecast.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Updated twice a day from NEA. The forecast is for the next 4 days.
 
-        Returns:
-            (dict) Weather forecast for the next 4 days by area.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/weather-forecast?resource_id=4df6d890-f23e-47f0-add1-fd6d580447d1
+        :return: 4 Day Weather Forecast. (Cached for 12 hours.)
+        :rtype: WeatherForecastFourDayDict
         """
         four_day_weather_forecast: WeatherForecastFourDayDict
 
@@ -373,22 +312,14 @@ class Client(DataGovSg):
     ) -> EnvironmentReadingDict:
         """Get wind direction readings across Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Has per-minute readings from NEA.
 
-        Returns:
-            (dict) Readings of wind direction by station.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/realtime-weather-readings?resource_id=5dcf8aa5-cf6a-44e4-b359-1173eecfdf4c
+        :return: Wind Direction Information. (Cached for 1 minute.)
+        :rtype: EnvironmentReadingDict
         """
         wind_direction: EnvironmentReadingDict
 
@@ -409,22 +340,14 @@ class Client(DataGovSg):
     ) -> EnvironmentReadingDict:
         """Get wind speed readings across Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the readings.
-                Will be standardised to SGT timezone.
-                If both `dt` and `date_time` are specified, then `date_time`
-                is used.
-            dt (date):
-                (optional) Specific date to retrieve the readings.
-                If both `dt` and `date_time` are specified, then `dt`
-                is NOT used.
+        Has per-minute readings from NEA.
 
-        Returns:
-            (dict) Readings of wind speed by station.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
 
-        References:
-            https://data.gov.sg/dataset/realtime-weather-readings?resource_id=16035f22-37b4-4a5c-b024-ca2381f11b48
+        :return: Wind Speed Information. (Cached for 1 minute.)
+        :rtype: EnvironmentReadingDict
         """
         wind_speed: EnvironmentReadingDict
 
