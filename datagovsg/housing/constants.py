@@ -1,4 +1,4 @@
-# Copyright 2019 Yuhui
+# Copyright 2025 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,4 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .client import Client
+"""Constants for all Housing-related APIs."""
+
+from ..constants import BASE_V1_API_ENDPOINT
+
+TRANSPORT_API_ENDPOINT = f'{BASE_V1_API_ENDPOINT}/transport'
+
+CARPARK_AVAILABILITY_API_ENDPOINT = \
+    f'{TRANSPORT_API_ENDPOINT}/carpark-availability'
+
+__all__ = [
+    'CARPARK_AVAILABILITY_API_ENDPOINT',
+]

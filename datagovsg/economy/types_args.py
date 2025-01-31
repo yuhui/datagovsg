@@ -1,4 +1,4 @@
-# Copyright 2019 Yuhui
+# Copyright 2025 Yuhui. All rights reserved.
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Constants for all Technology-related APIs."""
+"""Data.gov.sg custom types for Economy client methods' arguments."""
 
-from ..constants import (
-    BASE_API_ENDPOINT,
-    CACHE_MAXSIZE,
-    CACHE_ONE_DAY,
-)
+from datetime import date
+from typing import NotRequired
+try:
+    from typing import TypedDict
+except ImportError:
+    TypedDict = dict
 
-TECHNOLOGY_API_ENDPOINT = '{}/technology'.format(BASE_API_ENDPOINT)
+class EconomyArgsDict(TypedDict):
+    """Type definition for designs(), patents() and trademarks() input \
+        arguments
+    """
 
-IPOS_API_ENDPOINT = '{}/ipos'.format(TECHNOLOGY_API_ENDPOINT)
-IPOS_DESIGNS_API_ENDPOINT = '{}/designs'.format(IPOS_API_ENDPOINT)
-IPOS_PATENTS_API_ENDPOINT = '{}/patents'.format(IPOS_API_ENDPOINT)
-IPOS_TRADEMARKS_API_ENDPOINT = '{}/trademarks'.format(IPOS_API_ENDPOINT)
+    lodgement_date: NotRequired[date]
+    """Retrieve applications lodged at that moment in time.
+
+    :example: date(2025, 1, 12)
+    """
+
+__all__ = [
+    'EconomyArgsDict',
+]

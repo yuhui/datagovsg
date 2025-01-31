@@ -1,4 +1,4 @@
-# Copyright 2019 Yuhui
+# Copyright 2019-2025 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,28 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test that the Technology class is working properly."""
+"""Constants for all Economy-related APIs."""
 
-import pytest
-from requests.exceptions import HTTPError
+from ..constants import BASE_V1_API_ENDPOINT
 
-from datagovsg import Technology
+ECONOMY_API_ENDPOINT = f'{BASE_V1_API_ENDPOINT}/technology'
 
-@pytest.fixture(scope='module')
-def client():
-    return Technology()
+IPOS_API_ENDPOINT = f'{ECONOMY_API_ENDPOINT}/ipos'
 
-def test_designs(client):
-    designs = client.designs()
+IPOS_DESIGNS_API_ENDPOINT = f'{IPOS_API_ENDPOINT}/designs'
+IPOS_PATENTS_API_ENDPOINT = f'{IPOS_API_ENDPOINT}/patents'
+IPOS_TRADEMARKS_API_ENDPOINT = f'{IPOS_API_ENDPOINT}/trademarks'
 
-    assert isinstance(designs, dict)
-
-def test_patents(client):
-    patents = client.patents()
-
-    assert isinstance(patents, dict)
-
-def test_trademarks(client):
-    trademarks = client.trademarks()
-
-    assert isinstance(trademarks, dict)
+__all__ = [
+    'IPOS_DESIGNS_API_ENDPOINT',
+    'IPOS_PATENTS_API_ENDPOINT',
+    'IPOS_TRADEMARKS_API_ENDPOINT',
+]

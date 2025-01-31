@@ -1,4 +1,4 @@
-# Copyright 2019 Yuhui
+# Copyright 2019-2025 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,81 +14,87 @@
 
 """Client for interacting with the Transport APIs."""
 
-from cachetools import cached, TTLCache
+from typing import Unpack
 
-from .constants import *
-from .. import net
-from ..client import __Client
+from typeguard import typechecked
 
-class Client(__Client):
-    """Interact with the transport-related endpoints."""
+from ..constants import CACHE_THIRTY_SECONDS, CACHE_ONE_MINUTE
+from ..datagovsg import DataGovSg
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
-    def carpark_availability(self, date_time=None):
-        """Get the latest carpark availability in Singapore.
+from .constants import (
+    TAXI_AVAILABILITY_API_ENDPOINT,
+    TRAFFIC_IMAGES_API_ENDPOINT,
+)
+from .types_args import TransportArgsDict
+from .types import (
+    TaxiAvailabilityDict,
+    TrafficImagesDict,
+)
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the availabilities
-                at that time.
-                Can be in any timezone (will be standardised to SGT.)
+class Client(DataGovSg):
+    """Interact with the transport-related endpoints.
 
-        Returns:
-            (dict) Available carpark spaces.
+    Reference: \
+        https://data.gov.sg/datasets?formats=API&topics=transport
+    """
 
-        References:
-            https://data.gov.sg/dataset/carpark-availability
-        """
-        carpark_availabilities = net.send_request(
-            CARPARK_AVAILABILITY_API_ENDPOINT,
-            date_time=date_time,
-        )
-
-        return carpark_availabilities
-
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
-    def taxi_availability(self, date_time=None):
+    @typechecked
+    def taxi_availability(
+        self,
+        **kwargs: Unpack[TransportArgsDict],
+    ) -> TaxiAvailabilityDict:
         """Get locations of available taxis in Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the availabilities
-                at that time.
-                Can be in any timezone (will be standardised to SGT.)
+        Retrieved every 30 seconds from LTA's Datamall.
 
-        Returns:
-            (dict) GeoJSON of the taxi availabilities.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: TransportArgsDict
 
-        References:
-            https://data.gov.sg/dataset/taxi-availability
+        :return: GeoJSON of the taxi availabilities. (Cached for 30 seconds.)
+        :rtype: TaxiAvailabilityDict
         """
-        taxi_availabilities = net.send_request(
+        taxi_availability: TaxiAvailabilityDict
+
+        params = self.build_params(kwargs)
+
+        taxi_availability = self.send_request(
             TAXI_AVAILABILITY_API_ENDPOINT,
-            accept_type='vnd.geo+json',
-            date_time=date_time,
+            params=params,
+            cache_duration=CACHE_THIRTY_SECONDS,
         )
 
-        return taxi_availabilities
+        return taxi_availability
 
-    @cached(cache=TTLCache(maxsize=CACHE_MAXSIZE, ttl=CACHE_ONE_MINUTE))
-    def traffic_images(self, date_time=None):
+    @typechecked
+    def traffic_images(
+        self,
+        **kwargs: Unpack[TransportArgsDict],
+    ) -> TrafficImagesDict:
         """Get the latest images from traffic cameras all around Singapore.
 
-        Arguments:
-            date_time (datetime):
-                (optional) Specific date-time to retrieve the images
-                at that time.
-                Can be in any timezone (will be standardised to SGT.)
+        Retrieved every 20 seconds from LTA's Datamall. But it is recommended \
+            to retrieve the data every minute.
 
-        Returns:
-            (dict) Images from traffic cameras.
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: TransportArgsDict
 
-        References:
-            https://data.gov.sg/dataset/traffic-images
+        :return: Images from traffic cameras. (Cached for 1 minute.)
+        :rtype: TrafficImagesDict
         """
-        traffic_images = net.send_request(
+        traffic_images: TrafficImagesDict
+
+        params = self.build_params(kwargs)
+
+        traffic_images = self.send_request(
             TRAFFIC_IMAGES_API_ENDPOINT,
-            date_time=date_time,
+            params=params,
+            cache_duration=CACHE_ONE_MINUTE,
         )
 
         return traffic_images
+
+__all__ = [
+    'Client',
+]

@@ -6,6 +6,7 @@ Package Reference
 
    package/datagovsg
    package/datagovsg.ckan
+   package/datagovsg.economy
    package/datagovsg.environment
-   package/datagovsg.technology
+   package/datagovsg.housing
    package/datagovsg.transport

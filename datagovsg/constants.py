@@ -1,4 +1,4 @@
-# Copyright 2019 Yuhui
+# Copyright 2019-2025 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +14,34 @@
 
 """Constants that can be used anywhere."""
 
-BASE_API_DOMAIN = 'https://api.data.gov.sg'
-BASE_API_ENDPOINT = '{}/v1'.format(BASE_API_DOMAIN)
+BASE_V1_API_ENDPOINT = 'https://api.data.gov.sg/v1'
+BASE_V2_API_ENDPOINT = 'https://api-open.data.gov.sg/v2/real-time/api'
 
-BASE_CKAN_DOMAIN = 'https://data.gov.sg'
-BASE_CKAN_ENDPOINT = '{}/api/action'.format(BASE_CKAN_DOMAIN)
+CACHE_NAME = 'datagovsg_cache'
 
-CACHE_MAXSIZE = 1024
-CACHE_ONE_MINUTE = 60
+CACHE_THIRTY_SECONDS = 30
+CACHE_ONE_MINUTE = CACHE_THIRTY_SECONDS * 2
 CACHE_FIVE_MINUTES = CACHE_ONE_MINUTE * 5
 CACHE_THIRTY_MINUTES = CACHE_ONE_MINUTE * 30
 CACHE_ONE_HOUR = CACHE_ONE_MINUTE * 60
 CACHE_TWELVE_HOURS = CACHE_ONE_HOUR * 12
 CACHE_ONE_DAY = CACHE_ONE_HOUR * 24
+
+USER_AGENT = 'Data.gov.sg Python package/2.0.0 https://pypi.org/project/datagovsg'
+
+__all__ = [
+    'BASE_V1_API_ENDPOINT',
+    'BASE_V2_API_ENDPOINT',
+
+    'CACHE_NAME',
+
+    'CACHE_THIRTY_SECONDS',
+    'CACHE_ONE_MINUTE',
+    'CACHE_FIVE_MINUTES',
+    'CACHE_THIRTY_MINUTES',
+    'CACHE_ONE_HOUR',
+    'CACHE_TWELVE_HOURS',
+    'CACHE_ONE_DAY',
+
+    'USER_AGENT',
+]
