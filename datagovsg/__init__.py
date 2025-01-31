@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name = 'datagovsg'
-version = '1.0.3'
-author = 'Yuhui'
-author_email = 'yuhuibc@gmail.com'
+from datetime import datetime
 
 from .ckan import Client as Ckan
 from .environment import Client as Environment
 from .technology import Client as Technology
 from .transport import Client as Transport
+
+NAME = 'datagovsg'
+VERSION = '2.0.0' # Production
+VERSION = f'{VERSION}.{datetime.now().strftime("%Y%m%d%H%M")}' # Development
+AUTHOR = 'Yuhui'
+AUTHOR_EMAIL = 'yuhuibc@gmail.com'
 
 __all__ = [
     'Ckan',
