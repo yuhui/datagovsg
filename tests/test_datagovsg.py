@@ -21,7 +21,6 @@ from zoneinfo import ZoneInfo
 
 import pytest
 from requests import HTTPError
-from typeguard import TypeCheckError
 
 from datagovsg.datagovsg import DataGovSg
 

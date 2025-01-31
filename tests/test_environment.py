@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=invalid-name,missing-function-docstring,redefined-outer-name,unused-argument
+# pylint: disable=broad-exception-caught,invalid-name,missing-function-docstring,redefined-outer-name,unused-argument
 
 """Test that the Environment class is working properly."""
 
