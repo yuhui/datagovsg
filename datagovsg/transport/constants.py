@@ -14,19 +14,11 @@
 
 """Constants for all Traffic-related APIs."""
 
-from ..constants import (
-    BASE_API_ENDPOINT,
-    CACHE_MAXSIZE,
-    CACHE_ONE_MINUTE,
-)
+from ..constants import BASE_V1_API_ENDPOINT
 
-TRANSPORT_API_ENDPOINT = '{}/transport'.format(BASE_API_ENDPOINT)
-CARPARK_AVAILABILITY_API_ENDPOINT = '{}/carpark-availability'.format(
-    TRANSPORT_API_ENDPOINT,
-)
-TAXI_AVAILABILITY_API_ENDPOINT = '{}/taxi-availability'.format(
-    TRANSPORT_API_ENDPOINT,
-)
-TRAFFIC_IMAGES_API_ENDPOINT = '{}/traffic-images'.format(
-    TRANSPORT_API_ENDPOINT,
-)
+TRANSPORT_API_ENDPOINT = f'{BASE_V1_API_ENDPOINT}/transport'
+
+CARPARK_AVAILABILITY_API_ENDPOINT = \
+    f'{TRANSPORT_API_ENDPOINT}/carpark-availability'
+TAXI_AVAILABILITY_API_ENDPOINT = f'{TRANSPORT_API_ENDPOINT}/taxi-availability'
+TRAFFIC_IMAGES_API_ENDPOINT = f'{TRANSPORT_API_ENDPOINT}/traffic-images'

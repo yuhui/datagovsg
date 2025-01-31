@@ -14,8 +14,8 @@
 
 """Constants that can be used anywhere."""
 
-BASE_API_DOMAIN = 'https://api.data.gov.sg'
-BASE_API_ENDPOINT = '{}/v1'.format(BASE_API_DOMAIN)
+BASE_V1_API_ENDPOINT = 'https://api.data.gov.sg/v1'
+BASE_V2_API_ENDPOINT = 'https://api-open.data.gov.sg/v2/real-time/api'
 
 
 CACHE_MAXSIZE = 1024
