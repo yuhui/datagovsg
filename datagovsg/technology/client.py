@@ -16,9 +16,15 @@
 
 from cachetools import cached, TTLCache
 
-from .constants import *
 from .. import net
 from ..client import __Client
+from ..constants import CACHE_TWELVE_HOURS
+
+from .constants import (
+    IPOS_DESIGNS_API_ENDPOINT,
+    IPOS_PATENTS_API_ENDPOINT,
+    IPOS_TRADEMARKS_API_ENDPOINT,
+)
 
 class Client(__Client):
     """Interact with the technology-related endpoints."""

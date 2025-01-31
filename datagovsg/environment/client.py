@@ -17,9 +17,28 @@
 from cachetools import cached, TTLCache
 from datetime import date, datetime
 
-from .constants import *
 from .. import net
 from ..client import __Client
+from ..constants import (
+    CACHE_ONE_MINUTE,
+    CACHE_FIVE_MINUTES,
+    CACHE_THIRTY_MINUTES,
+    CACHE_ONE_HOUR,
+    CACHE_TWELVE_HOURS,
+)
+from .constants import (
+    AIR_TEMPERATURE_API_ENDPOINT,
+    FOUR_DAY_WEATHER_FORECAST_API_ENDPOINT,
+    PM25_API_ENDPOINT,
+    PSI_API_ENDPOINT,
+    RAINFALL_API_ENDPOINT,
+    RELATIVE_HUMIDITY_API_ENDPOINT,
+    TWENTY_FOUR_HOUR_WEATHER_FORECAST_API_ENDPOINT,
+    TWO_HOUR_WEATHER_FORECAST_API_ENDPOINT,
+    UV_INDEX_API_ENDPOINT,
+    WIND_DIRECTION_API_ENDPOINT,
+    WIND_SPEED_API_ENDPOINT,
+)
 
 class Client(__Client):
     """Interact with the environment-related endpoints."""

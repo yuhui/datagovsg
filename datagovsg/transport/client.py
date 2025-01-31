@@ -15,10 +15,15 @@
 """Client for interacting with the Transport APIs."""
 
 from cachetools import cached, TTLCache
+from ..constants import CACHE_THIRTY_SECONDS, CACHE_ONE_MINUTE
 
-from .constants import *
 from .. import net
 from ..client import __Client
+from .constants import (
+    CARPARK_AVAILABILITY_API_ENDPOINT,
+    TAXI_AVAILABILITY_API_ENDPOINT,
+    TRAFFIC_IMAGES_API_ENDPOINT,
+)
 
 class Client(__Client):
     """Interact with the transport-related endpoints."""
