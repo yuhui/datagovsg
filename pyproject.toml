@@ -1,0 +1,54 @@
+[build-system]
+requires = [
+    "datagovsg",
+    "requests-cache",
+    "setuptools",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datagovsg"
+dynamic = [
+    "dependencies",
+    "version"
+]
+authors = [{name = "Yuhui", email = "yuhuibc@gmail.com"}]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: OS Independent",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+description = "Python package for interacting with APIs available at Data.gov.sg"
+keywords = [
+    'datagovsg',
+    'data.gov.sg',
+    "python",
+    "singapore",
+    "wrapper",
+]
+license = {file = "LICENSE.txt"}
+readme = "README.rst"
+requires-python = ">= 3.13"
+
+    [project.urls]
+    Homepage = "https://github.com/yuhui/datagovsg"
+    Documentation = "https://datagovsg.readthedocs.io/en/latest/"
+    Repository = "https://github.com/yuhui/datagovsg.git"
+    "Bug Tracker" = "https://github.com/yuhui/datagovsg/issues"
+    Changelog = "https://github.com/yuhui/datagovsg/blob/master/CHANGELOG.rst"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+version = {attr = "datagovsg.__version__"}
+
+[tool.setuptools.package-data]
+datagovsg = ["py.typed"]
