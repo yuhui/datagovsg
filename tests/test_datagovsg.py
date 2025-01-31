@@ -30,11 +30,11 @@ SANITISE_DATA_DICT = {
     'value_bool': True,
     'value_date': '1/7/2019',
     'value_list': [1, '2', {
-        'date_time': '2024-12-01 09:57:45',
+        'date_time': '2024-12-01 09:57:45+08:00',
     }],
     'value_dict': {
         'key1': '316',
-        'date_time': '2024-12-01T09:57:45.789',
+        'date_time': '2024-12-01T09:57:45.789+08:00',
     },
 }
 
