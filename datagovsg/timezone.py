@@ -17,20 +17,25 @@
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-def datetime_as_sgt(dt):
+from typeguard import typechecked
+
 DATE_FORMAT = '%Y-%m-%d'
 TIME_FORMAT = '%H:%M:%S'
 
+@typechecked
+def datetime_as_sgt(dt: datetime) -> datetime:
     """Set a datetime with the SGT timezone and return the datetime.
 
     Raises:
         AssertionError:
             Raised if `dt` is not of datetime class.
     """
-    assert isinstance(dt, datetime)
-    return dt.astimezone(ZoneInfo('Asia/Singapore'))
+    dt_sg: datetime = dt.astimezone(ZoneInfo('Asia/Singapore'))
+    return dt_sg
 
-def datetime_from_string(val):
+@typechecked
+def datetime_from_string(val: str) -> datetime | date:
+
     """Convert a YYYY-MM-DDTHH:MM:SS string into a datetime
     and return the datetime.
 
@@ -38,6 +43,8 @@ def datetime_from_string(val):
         ValueError:
             Raised if `val` is not in a valid datetime format.
     """
+    dt: datetime | date
+
     # try parsing without time
     try:
         dt_format = DATE_FORMAT

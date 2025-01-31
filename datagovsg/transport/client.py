@@ -14,6 +14,10 @@
 
 """Client for interacting with the Transport APIs."""
 
+from typing import Unpack
+
+from typeguard import typechecked
+
 from ..constants import CACHE_THIRTY_SECONDS, CACHE_ONE_MINUTE
 from ..datagovsg import DataGovSg
 
@@ -22,11 +26,21 @@ from .constants import (
     TAXI_AVAILABILITY_API_ENDPOINT,
     TRAFFIC_IMAGES_API_ENDPOINT,
 )
+from .types_args import TransportArgsDict
+from .types import (
+    CarparkAvailabilityDict,
+    TaxiAvailabilityDict,
+    TrafficImagesDict,
+)
 
 class Client(DataGovSg):
     """Interact with the transport-related endpoints."""
 
-    def carpark_availability(self, date_time=None):
+    @typechecked
+    def carpark_availability(
+        self,
+        **kwargs: Unpack[TransportArgsDict],
+    ) -> CarparkAvailabilityDict:
         """Get the latest carpark availability in Singapore.
 
         Arguments:
@@ -41,18 +55,24 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/carpark-availability
         """
+        carpark_availability: CarparkAvailabilityDict
+
         params = self.build_params(kwargs)
 
-        carpark_availabilities = self.send_request(
+        carpark_availability = self.send_request(
             CARPARK_AVAILABILITY_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_MINUTE,
             sanitise_numbers=True,
         )
 
-        return carpark_availabilities
+        return carpark_availability
 
-    def taxi_availability(self, date_time=None):
+    @typechecked
+    def taxi_availability(
+        self,
+        **kwargs: Unpack[TransportArgsDict],
+    ) -> TaxiAvailabilityDict:
         """Get locations of available taxis in Singapore.
 
         Arguments:
@@ -67,17 +87,23 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/taxi-availability
         """
+        taxi_availability: TaxiAvailabilityDict
+
         params = self.build_params(kwargs)
 
-        taxi_availabilities = self.send_request(
+        taxi_availability = self.send_request(
             TAXI_AVAILABILITY_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_THIRTY_SECONDS,
         )
 
-        return taxi_availabilities
+        return taxi_availability
 
-    def traffic_images(self, date_time=None):
+    @typechecked
+    def traffic_images(
+        self,
+        **kwargs: Unpack[TransportArgsDict],
+    ) -> TrafficImagesDict:
         """Get the latest images from traffic cameras all around Singapore.
 
         Arguments:
@@ -92,6 +118,8 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/traffic-images
         """
+        traffic_images: TrafficImagesDict
+
         params = self.build_params(kwargs)
 
         traffic_images = self.send_request(

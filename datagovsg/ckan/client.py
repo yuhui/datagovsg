@@ -46,7 +46,7 @@ class Client:
         """
         warn('CKAN has been removed from Data.gov.sg.', DeprecationWarning)
 
-        data = None
+        data: None = None
 
         return data
 
@@ -61,7 +61,7 @@ class Client:
         """
         warn('CKAN has been removed from Data.gov.sg.', DeprecationWarning)
 
-        package_list = None
+        package_list: None = None
 
         return package_list
 
@@ -76,7 +76,7 @@ class Client:
         """
         warn('CKAN has been removed from Data.gov.sg.', DeprecationWarning)
 
-        package = None
+        package: None = None
 
         return package
 
@@ -91,7 +91,7 @@ class Client:
         """
         warn('CKAN has been removed from Data.gov.sg.', DeprecationWarning)
 
-        resource = None
+        resource: None = None
 
         return resource
 

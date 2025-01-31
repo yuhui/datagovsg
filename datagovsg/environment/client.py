@@ -14,7 +14,10 @@
 
 """Client for interacting with the Environment APIs."""
 
+from typing import Any, Unpack
 from urllib.parse import urlencode
+
+from typeguard import typechecked
 
 from ..constants import (
     CACHE_ONE_MINUTE,
@@ -24,6 +27,8 @@ from ..constants import (
     CACHE_TWELVE_HOURS,
 )
 from ..datagovsg import DataGovSg
+from ..types import Url
+
 from .constants import (
     AIR_TEMPERATURE_API_ENDPOINT,
     FOUR_DAY_WEATHER_FORECAST_API_ENDPOINT,
@@ -37,11 +42,25 @@ from .constants import (
     WIND_DIRECTION_API_ENDPOINT,
     WIND_SPEED_API_ENDPOINT,
 )
+from .types_args import EnvironmentArgsDict
+from .types import (
+    EnvironmentReadingDict,
+    PM25Dict,
+    PSIDict,
+    UVIndexDict,
+    WeatherForecastTwoHourDict,
+    WeatherForecastTwentyFourHourDict,
+    WeatherForecastFourDayDict,
+)
 
 class Client(DataGovSg):
     """Interact with the environment-related endpoints."""
 
-    def air_temperature(self, date_time=None, dt=None):
+    @typechecked
+    def air_temperature(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict],
+    ) -> EnvironmentReadingDict:
         """Get air temperature readings across Singapore.
 
         Arguments:
@@ -61,6 +80,7 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=17494bed-23e9-4b3b-ae89-232f87987163
         """
+        air_temperature: EnvironmentReadingDict
 
         params = self.build_params(kwargs)
 
@@ -72,7 +92,8 @@ class Client(DataGovSg):
 
         return air_temperature
 
-    def pm25(self, date_time=None, dt=None):
+    @typechecked
+    def pm25(self, **kwargs: Unpack[EnvironmentArgsDict]) -> PM25Dict:
         """Retrieve the latest PM2.5 information in Singapore.
 
         Arguments:
@@ -92,17 +113,20 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/pm2-5
         """
+        pm25: PM25Dict
+
         params = self.build_params(kwargs)
 
-        pm25_information = self.__collect_environment_data(
+        pm25 = self.__collect_environment_data(
             PM25_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_HOUR,
         )
 
-        return pm25_information
+        return pm25
 
-    def psi(self, date_time=None, dt=None):
+    @typechecked
+    def psi(self, **kwargs: Unpack[EnvironmentArgsDict]) -> PSIDict:
         """Retrieve the latest PSI information in Singapore.
 
         Arguments:
@@ -122,18 +146,23 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/psi
         """
+        psi: PSIDict
 
         params = self.build_params(kwargs)
 
-        psi_information = self.__collect_environment_data(
+        psi = self.__collect_environment_data(
             PSI_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_HOUR,
         )
 
-        return psi_information
+        return psi
 
-    def rainfall(self, date_time=None, dt=None):
+    @typechecked
+    def rainfall(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict],
+    ) -> EnvironmentReadingDict:
         """Get rainfall readings across Singapore.
 
         Arguments:
@@ -153,6 +182,7 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=8bd37e06-cdd7-4ca4-9ad8-5754eb70a33d
         """
+        rainfall: EnvironmentReadingDict
 
         params = self.build_params(kwargs)
 
@@ -164,7 +194,11 @@ class Client(DataGovSg):
 
         return rainfall
 
-    def relative_humidity(self, date_time=None, dt=None):
+    @typechecked
+    def relative_humidity(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict],
+    ) -> EnvironmentReadingDict:
         """Get relative humidity readings across Singapore.
 
         Arguments:
@@ -184,6 +218,7 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=59eb2883-2ceb-4d16-85f0-7e3a3176ef46
         """
+        relative_humidity: EnvironmentReadingDict
 
         params = self.build_params(kwargs)
 
@@ -195,7 +230,8 @@ class Client(DataGovSg):
 
         return relative_humidity
 
-    def uv_index(self, date_time=None):
+    @typechecked
+    def uv_index(self, **kwargs: Unpack[EnvironmentArgsDict]) -> UVIndexDict:
         """Retrieve the latest UV index information in Singapore.
 
         Arguments:
@@ -209,17 +245,23 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/ultraviolet-index-uvi
         """
+        uv_index: UVIndexDict
+
         params = self.build_params(kwargs)
 
-        uv_index_information = self.__collect_environment_data(
+        uv_index = self.__collect_environment_data(
             UV_INDEX_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_HOUR,
         )
 
-        return uv_index_information
+        return uv_index
 
-    def two_hour_weather_forecast(self, date_time=None, dt=None):
+    @typechecked
+    def two_hour_weather_forecast(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict],
+    ) -> WeatherForecastTwoHourDict:
         """Retrieve the latest two hour weather forecast across Singapore.
 
         Arguments:
@@ -239,6 +281,7 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/weather-forecast?resource_id=571ef5fb-ed31-48b2-85c9-61677de42ca9
         """
+        two_hour_weather_forecast: WeatherForecastTwoHourDict
 
         params = self.build_params(kwargs)
 
@@ -250,7 +293,11 @@ class Client(DataGovSg):
 
         return two_hour_weather_forecast
 
-    def twenty_four_hour_weather_forecast(self, date_time=None, dt=None):
+    @typechecked
+    def twenty_four_hour_weather_forecast(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict],
+    ) -> WeatherForecastTwentyFourHourDict:
         """Retrieve the latest 24 hour weather forecast across Singapore.
 
         Arguments:
@@ -270,6 +317,7 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/weather-forecast?resource_id=9a8bd97e-0e38-46b7-bc39-9a2cb4a53a62
         """
+        twenty_four_hour_weather_forecast: WeatherForecastTwentyFourHourDict
 
         params = self.build_params(kwargs)
 
@@ -281,7 +329,11 @@ class Client(DataGovSg):
 
         return twenty_four_hour_weather_forecast
 
-    def four_day_weather_forecast(self, date_time=None, dt=None):
+    @typechecked
+    def four_day_weather_forecast(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict],
+    ) -> WeatherForecastFourDayDict:
         """Retrieve the latest 4 day weather forecast.
 
         Arguments:
@@ -301,6 +353,8 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/weather-forecast?resource_id=4df6d890-f23e-47f0-add1-fd6d580447d1
         """
+        four_day_weather_forecast: WeatherForecastFourDayDict
+
         params = self.build_params(kwargs)
 
         four_day_weather_forecast = self.__collect_environment_data(
@@ -311,7 +365,11 @@ class Client(DataGovSg):
 
         return four_day_weather_forecast
 
-    def wind_direction(self, date_time=None, dt=None):
+    @typechecked
+    def wind_direction(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict],
+    ) -> EnvironmentReadingDict:
         """Get wind direction readings across Singapore.
 
         Arguments:
@@ -331,6 +389,9 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=5dcf8aa5-cf6a-44e4-b359-1173eecfdf4c
         """
+        wind_direction: EnvironmentReadingDict
+
+        params = self.build_params(kwargs)
 
         wind_direction = self.__collect_environment_data(
             WIND_DIRECTION_API_ENDPOINT,
@@ -340,7 +401,11 @@ class Client(DataGovSg):
 
         return wind_direction
 
-    def wind_speed(self, date_time=None, dt=None):
+    @typechecked
+    def wind_speed(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict],
+    ) -> EnvironmentReadingDict:
         """Get wind speed readings across Singapore.
 
         Arguments:
@@ -360,6 +425,8 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/realtime-weather-readings?resource_id=16035f22-37b4-4a5c-b024-ca2381f11b48
         """
+        wind_speed: EnvironmentReadingDict
+
         params = self.build_params(kwargs)
 
         wind_speed = self.__collect_environment_data(

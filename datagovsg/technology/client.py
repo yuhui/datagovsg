@@ -14,6 +14,9 @@
 
 """Client for interacting with the Technology APIs."""
 
+from typing import Unpack
+
+from typeguard import typechecked
 
 from ..constants import CACHE_TWELVE_HOURS
 from ..datagovsg import DataGovSg
@@ -23,11 +26,18 @@ from .constants import (
     IPOS_PATENTS_API_ENDPOINT,
     IPOS_TRADEMARKS_API_ENDPOINT,
 )
+from .types_args import TechnologyArgsDict
+from .types import (
+    DesignsDict,
+    PatentsDict,
+    TrademarksDict,
+)
 
 class Client(DataGovSg):
     """Interact with the technology-related endpoints."""
 
-    def designs(self, date=None):
+    @typechecked
+    def designs(self, **kwargs: Unpack[TechnologyArgsDict]) -> DesignsDict:
         """Get design applications lodged with IPOS in Singapore.
 
         Arguments:
@@ -42,17 +52,20 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/ipos-apis?resource_id=adf6222f-955b-4a76-892f-802a396844a1
         """
+        designs: DesignsDict
+
         params = self.build_params(kwargs)
 
-        lodged_designs = self.send_request(
+        designs = self.send_request(
             IPOS_DESIGNS_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_TWELVE_HOURS,
         )
 
-        return lodged_designs
+        return designs
 
-    def patents(self, date=None):
+    @typechecked
+    def patents(self, **kwargs: Unpack[TechnologyArgsDict]) -> PatentsDict:
         """Get patent applications lodged with IPOS in Singapore.
 
         Arguments:
@@ -67,17 +80,20 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/ipos-apis?resource_id=6a030bf2-22da-4621-8ab0-9a5956a30ef3
         """
+        patents: PatentsDict
+
         params = self.build_params(kwargs)
 
-        lodged_patents = self.send_request(
+        patents = self.send_request(
             IPOS_PATENTS_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_TWELVE_HOURS,
         )
 
-        return lodged_patents
+        return patents
 
-    def trademarks(self, date=None):
+    @typechecked
+    def trademarks(self, **kwargs: Unpack[TechnologyArgsDict]) -> TrademarksDict:
         """Get trademark applications lodged with IPOS in Singapore.
 
         Arguments:
@@ -92,15 +108,17 @@ class Client(DataGovSg):
         References:
             https://data.gov.sg/dataset/ipos-apis?resource_id=1522db0e-808b-48ea-9869-fe5adc566585
         """
+        trademarks: TrademarksDict
+
         params = self.build_params(kwargs)
 
-        lodged_trademarks = self.send_request(
+        trademarks = self.send_request(
             IPOS_TRADEMARKS_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_TWELVE_HOURS,
         )
 
-        return lodged_trademarks
+        return trademarks
 
 __all__ = [
     'Client',
