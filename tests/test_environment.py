@@ -1,4 +1,4 @@
-# Copyright 2019 Yuhui
+# Copyright 2019-2025 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,69 +12,197 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# pylint: disable=invalid-name,missing-function-docstring,redefined-outer-name,unused-argument
+
 """Test that the Environment class is working properly."""
 
+from datetime import date, datetime, time, timedelta
+from time import sleep
+from zoneinfo import ZoneInfo
+
 import pytest
-from requests.exceptions import HTTPError
 
 from datagovsg import Environment
+
+METHODS_RETURNING_ENVIRONMENT_READINGS_PER_MINUTE = [
+    'air_temperature',
+    'rainfall',
+    'relative_humidity',
+    'wind_direction',
+    'wind_speed',
+]
+METHODS_RETURNING_ENVIRONMENT_ITEMS_PER_HOUR = [
+    'pm25',
+    'psi',
+]
+METHODS_RETURNING_ENVIRONMENT_RECORDS_PER_HOUR = [
+    'uv_index',
+]
+METHODS_RETURNING_ENVIRONMENT_READINGS = \
+    METHODS_RETURNING_ENVIRONMENT_READINGS_PER_MINUTE \
+    + METHODS_RETURNING_ENVIRONMENT_ITEMS_PER_HOUR \
+    + METHODS_RETURNING_ENVIRONMENT_RECORDS_PER_HOUR
+TEST_DATE = date.today() - timedelta(1)
+TEST_DATETIME = datetime.combine(
+    TEST_DATE,
+    time(23, 45, 16, tzinfo=ZoneInfo('Asia/Singapore'))
+)
 
 @pytest.fixture(scope='module')
 def client():
     return Environment()
 
-def test_air_temperature(client):
-    air_temperature = client.air_temperature()
+@pytest.mark.parametrize(
+    ('method'),
+    METHODS_RETURNING_ENVIRONMENT_READINGS,
+)
+def test_environment_readings(client, method):
+    try:
+        data = getattr(client, method, None)()
+    except Exception:
+        # try again
+        sleep(5)
+        data = getattr(client, method, None)()
 
-    assert isinstance(air_temperature, dict)
+    assert data is not None
 
-def test_pm25(client):
-    pm25 = client.pm25()
+@pytest.mark.parametrize(
+    ('method', 'data_items_name'),
+    [
+        (method, 'readings') \
+            for method in METHODS_RETURNING_ENVIRONMENT_READINGS_PER_MINUTE
+    ]
+    + [
+        (method, 'items') \
+            for method in METHODS_RETURNING_ENVIRONMENT_ITEMS_PER_HOUR
+    ]
+    + [
+        (method, 'records') \
+            for method in METHODS_RETURNING_ENVIRONMENT_RECORDS_PER_HOUR
+    ],
+)
+def test_environment_readings_with_date(client, method, data_items_name):
+    try:
+        data = getattr(client, method, None)(date=TEST_DATE)
+    except Exception:
+        # try again
+        sleep(5)
+        data = getattr(client, method, None)(date=TEST_DATE)
 
-    assert isinstance(pm25, dict)
+    assert all(
+        data_item['timestamp'].date() == TEST_DATE \
+            for data_item in data[data_items_name]
+    )
 
-def test_psi(client):
-    psi = client.psi()
+@pytest.mark.parametrize(
+    ('method', 'data_items_name'),
+    [
+        (method, 'readings') \
+            for method in METHODS_RETURNING_ENVIRONMENT_READINGS_PER_MINUTE
+    ]
+    + [
+        (method, 'items') \
+            for method in METHODS_RETURNING_ENVIRONMENT_ITEMS_PER_HOUR
+    ]
+    + [
+        (method, 'records') \
+            for method in METHODS_RETURNING_ENVIRONMENT_RECORDS_PER_HOUR
+    ],
+)
+def test_environment_readings_with_datetime(client, method, data_items_name):
+    try:
+        data = getattr(client, method, None)(date=TEST_DATETIME)
+    except Exception:
+        # try again
+        sleep(5)
+        data = getattr(client, method, None)(date=TEST_DATETIME)
 
-    assert isinstance(psi, dict)
+    assert len(data[data_items_name]) == 1
 
-def test_rainfall(client):
-    rainfall = client.rainfall()
-
-    assert isinstance(rainfall, dict)
-
-def test_relative_humidity(client):
-    relative_humidity = client.relative_humidity()
-
-    assert isinstance(relative_humidity, dict)
-
-def test_uv_index(client):
-    uv_index = client.uv_index()
-
-    assert isinstance(uv_index, dict)
+    timestamp = data[data_items_name][0]['timestamp']
+    assert timestamp <= TEST_DATETIME
 
 def test_two_hour_weather_forecast(client):
     two_hour_weather_forecast = client.two_hour_weather_forecast()
 
-    assert isinstance(two_hour_weather_forecast, dict)
+    assert two_hour_weather_forecast is not None
+
+def test_two_hour_weather_forecast_with_date(client):
+    two_hour_weather_forecast = client.two_hour_weather_forecast(
+        date=TEST_DATE,
+    )
+
+    assert all(
+        item['timestamp'].date() <= TEST_DATE \
+            for item in two_hour_weather_forecast['items']
+    )
+
+def test_two_hour_weather_forecast_with_datetime(client):
+    two_hour_weather_forecast = client.two_hour_weather_forecast(
+        date=TEST_DATETIME,
+    )
+
+    assert len(two_hour_weather_forecast['items']) == 1
+
+    item = two_hour_weather_forecast['items'][0]
+
+    assert item['timestamp'] <= TEST_DATETIME
 
 def test_twenty_four_hour_weather_forecast(client):
     twenty_four_hour_weather_forecast = \
         client.twenty_four_hour_weather_forecast()
 
-    assert isinstance(twenty_four_hour_weather_forecast, dict)
+    assert twenty_four_hour_weather_forecast is not None
+
+def test_twenty_four_hour_weather_forecast_with_date(client):
+    twenty_four_hour_weather_forecast = \
+        client.twenty_four_hour_weather_forecast(date=TEST_DATE)
+
+    for record in twenty_four_hour_weather_forecast['records']:
+        assert all(
+            TEST_DATE <= period['timePeriod']['end'].date() \
+                for period in record['periods']
+        )
+
+def test_twenty_four_hour_weather_forecast_with_datetime(client):
+    twenty_four_hour_weather_forecast = \
+        client.twenty_four_hour_weather_forecast(date=TEST_DATETIME)
+
+    assert len(twenty_four_hour_weather_forecast['records']) == 1
+
+    record = twenty_four_hour_weather_forecast['records'][0]
+
+    assert all(
+        TEST_DATETIME <= period['timePeriod']['end'] \
+            for period in record['periods']
+    )
 
 def test_four_day_weather_forecast(client):
     four_day_weather_forecast = client.four_day_weather_forecast()
 
-    assert isinstance(four_day_weather_forecast, dict)
+    assert four_day_weather_forecast is not None
 
-def test_wind_direction(client):
-    wind_direction = client.wind_direction()
+def test_four_day_weather_forecast_with_date(client):
+    four_day_weather_forecast = client.four_day_weather_forecast(
+        date=TEST_DATE,
+    )
 
-    assert isinstance(wind_direction, dict)
+    for record in four_day_weather_forecast['records']:
+        assert all(
+            forecast['timestamp'].date() >= TEST_DATE \
+                for forecast in record['forecasts']
+        )
 
-def test_wind_speed(client):
-    wind_speed = client.wind_speed()
+def test_four_day_weather_forecast_with_datetime(client):
+    four_day_weather_forecast = client.four_day_weather_forecast(
+        date=TEST_DATETIME,
+    )
 
-    assert isinstance(wind_speed, dict)
+    assert len(four_day_weather_forecast['records']) == 1
+
+    record = four_day_weather_forecast['records'][0]
+
+    assert all(
+        forecast['timestamp'] >= TEST_DATETIME \
+            for forecast in record['forecasts']
+    )
