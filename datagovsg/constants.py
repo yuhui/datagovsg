@@ -17,8 +17,6 @@
 BASE_API_DOMAIN = 'https://api.data.gov.sg'
 BASE_API_ENDPOINT = '{}/v1'.format(BASE_API_DOMAIN)
 
-BASE_CKAN_DOMAIN = 'https://data.gov.sg'
-BASE_CKAN_ENDPOINT = '{}/api/action'.format(BASE_CKAN_DOMAIN)
 
 CACHE_MAXSIZE = 1024
 CACHE_ONE_MINUTE = 60
