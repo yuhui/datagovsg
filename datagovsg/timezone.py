@@ -14,8 +14,8 @@
 
 """Standardise all datetime-related timezones to SGT (Singapore Time)."""
 
-from datetime import datetime, timedelta, tzinfo
-from pytz import timezone as pytimezone
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 def datetime_as_sgt(dt):
     """Set a datetime with the SGT timezone and return the datetime.
@@ -25,7 +25,7 @@ def datetime_as_sgt(dt):
             Raised if `dt` is not of datetime class.
     """
     assert isinstance(dt, datetime)
-    return dt.astimezone(pytimezone('Asia/Singapore'))
+    return dt.astimezone(ZoneInfo('Asia/Singapore'))
 
 def datetime_from_string(val):
     """Convert a YYYY-MM-DDTHH:MM:SS string into a datetime
