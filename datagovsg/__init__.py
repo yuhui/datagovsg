@@ -31,3 +31,4 @@ __all__ = [
     'Technology',
     'Transport',
 ]
+__version__ = VERSION

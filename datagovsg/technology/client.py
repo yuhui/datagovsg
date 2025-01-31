@@ -91,3 +91,7 @@ class Client(__Client):
         )
 
         return lodged_trademarks
+
+__all__ = [
+    'Client',
+]

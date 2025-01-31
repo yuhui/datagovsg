@@ -95,3 +95,6 @@ class Client:
 
         return resource
 
+__all__ = [
+    'Client',
+]

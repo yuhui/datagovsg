@@ -385,3 +385,7 @@ class Client(__Client):
         )
 
         return wind_speed
+
+__all__ = [
+    'Client',
+]
