@@ -1,4 +1,4 @@
-# Copyright 2019 Yuhui
+# Copyright 2025 Yuhui. All rights reserved.
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,25 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Data.gov.sg custom types for Housing client methods' arguments."""
+
 from datetime import datetime
+from typing import NotRequired
+try:
+    from typing import TypedDict
+except ImportError:
+    TypedDict = dict
 
-from .ckan import Client as Ckan
-from .economy import Client as Economy
-from .environment import Client as Environment
-from .housing import Client as Housing
-from .transport import Client as Transport
+class HousingArgsDict(TypedDict):
+    """Type definition for carpark_availability() input arguments"""
 
-NAME = 'datagovsg'
-VERSION = '2.0.0' # Production
-VERSION = f'{VERSION}.{datetime.now().strftime("%Y%m%d%H%M")}' # Development
-AUTHOR = 'Yuhui'
-AUTHOR_EMAIL = 'yuhuibc@gmail.com'
+    date_time: NotRequired[datetime]
+    """Retrieve the latest availability at that moment in time.
+
+    :example: datetime(2024, 7, 16, 23, 59, 0)
+    """
 
 __all__ = [
-    'Ckan',
-    'Economy',
-    'Environment',
-    'Housing',
-    'Transport',
+    'HousingArgsDict',
 ]
-__version__ = VERSION

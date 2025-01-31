@@ -22,13 +22,11 @@ from ..constants import CACHE_THIRTY_SECONDS, CACHE_ONE_MINUTE
 from ..datagovsg import DataGovSg
 
 from .constants import (
-    CARPARK_AVAILABILITY_API_ENDPOINT,
     TAXI_AVAILABILITY_API_ENDPOINT,
     TRAFFIC_IMAGES_API_ENDPOINT,
 )
 from .types_args import TransportArgsDict
 from .types import (
-    CarparkAvailabilityDict,
     TaxiAvailabilityDict,
     TrafficImagesDict,
 )
@@ -39,35 +37,6 @@ class Client(DataGovSg):
     Reference: \
         https://data.gov.sg/datasets?formats=API&topics=transport
     """
-
-    @typechecked
-    def carpark_availability(
-        self,
-        **kwargs: Unpack[TransportArgsDict],
-    ) -> CarparkAvailabilityDict:
-        """Get the latest carpark availability in Singapore.
-
-        Retrieved every minute.
-
-        :param kwargs: Key-value arguments to be passed as parameters to the \
-            endpoint URL.
-        :type kwargs: TransportArgsDict
-
-        :return: Available carpark spaces. (Cached for 1 minute.)
-        :rtype: CarparkAvailabilityDict
-        """
-        carpark_availability: CarparkAvailabilityDict
-
-        params = self.build_params(kwargs)
-
-        carpark_availability = self.send_request(
-            CARPARK_AVAILABILITY_API_ENDPOINT,
-            params=params,
-            cache_duration=CACHE_ONE_MINUTE,
-            sanitise_numbers=True,
-        )
-
-        return carpark_availability
 
     @typechecked
     def taxi_availability(

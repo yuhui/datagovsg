@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Data.gov.sg custom types for Technology client methods' responses."""
+"""Data.gov.sg custom types for Economy client methods' responses."""
 
 from datetime import date
 from typing import NotRequired

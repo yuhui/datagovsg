@@ -1,4 +1,4 @@
-# Copyright 2019 Yuhui
+# Copyright 2019-2025 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Client for interacting with the Technology APIs."""
+"""Client for interacting with the Economy APIs."""
 
 from typing import Unpack
 
@@ -26,7 +26,7 @@ from .constants import (
     IPOS_PATENTS_API_ENDPOINT,
     IPOS_TRADEMARKS_API_ENDPOINT,
 )
-from .types_args import TechnologyArgsDict
+from .types_args import EconomyArgsDict
 from .types import (
     DesignsDict,
     PatentsDict,
@@ -34,21 +34,21 @@ from .types import (
 )
 
 class Client(DataGovSg):
-    """Interact with the technology-related endpoints.
+    """Interact with the economy-related endpoints.
 
     Reference: \
-        https://data.gov.sg/datasets?formats=API&topics=technology
+        https://data.gov.sg/datasets?formats=API&topics=economy
     """
 
     @typechecked
-    def designs(self, **kwargs: Unpack[TechnologyArgsDict]) -> DesignsDict:
+    def designs(self, **kwargs: Unpack[EconomyArgsDict]) -> DesignsDict:
         """Get design applications lodged with IPOS in Singapore.
 
         Updated daily from IPOS.
 
         :param kwargs: Key-value arguments to be passed as parameters to the \
             endpoint URL.
-        :type kwargs: TechnologyArgsDict
+        :type kwargs: EconomyArgsDict
 
         :return: Design application information. (Cached for 12 hours.)
         :rtype: DesignsDict
@@ -66,14 +66,14 @@ class Client(DataGovSg):
         return designs
 
     @typechecked
-    def patents(self, **kwargs: Unpack[TechnologyArgsDict]) -> PatentsDict:
+    def patents(self, **kwargs: Unpack[EconomyArgsDict]) -> PatentsDict:
         """Get patent applications lodged with IPOS in Singapore.
 
         Updated daily from IPOS.
 
         :param kwargs: Key-value arguments to be passed as parameters to the \
             endpoint URL.
-        :type kwargs: TechnologyArgsDict
+        :type kwargs: EconomyArgsDict
 
         :return: Patent application information. (Cached for 12 hours.)
         :rtype: PatentsDict
@@ -91,14 +91,14 @@ class Client(DataGovSg):
         return patents
 
     @typechecked
-    def trademarks(self, **kwargs: Unpack[TechnologyArgsDict]) -> TrademarksDict:
+    def trademarks(self, **kwargs: Unpack[EconomyArgsDict]) -> TrademarksDict:
         """Get trademark applications lodged with IPOS in Singapore.
 
         Updated daily from IPOS.
 
         :param kwargs: Key-value arguments to be passed as parameters to the \
             endpoint URL.
-        :type kwargs: TechnologyArgsDict
+        :type kwargs: EconomyArgsDict
 
         :return: Trademark application information. (Cached for 12 hours.)
         :rtype: TrademarksDict
