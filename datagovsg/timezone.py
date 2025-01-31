@@ -38,7 +38,8 @@ def datetime_as_sgt(dt: datetime) -> datetime:
 @typechecked
 def datetime_from_string(val: str) -> datetime | date:
     """Convert a YYYY-MM-DDTHH:MM:SS string into a datetime and return the \
-    datetime.
+    datetime. The timezone is always set to 'Asia/Singapore', regardless of \
+    what the original string's timezone (if any) indicates.
 
     :param val: String to convert to a datetime.
     :type val: str
