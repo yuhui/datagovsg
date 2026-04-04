@@ -19,8 +19,8 @@ from typing import Any, Optional
 
 from requests import codes as requests_codes
 from requests.adapters import HTTPAdapter, Retry
-from requests_cache import CachedSession
 from typeguard import typechecked
+from requests_cache import BaseCache, CachedSession
 
 from .constants import CACHE_NAME, USER_AGENT
 from .timezone import datetime_from_string
@@ -38,23 +38,36 @@ class DataGovSg:
         (Reference: https://stackoverflow.com/a/35504626.)
     - Cache (cache duration/expiry is set in ``send_request()``).
     - User-agent header.
+
+    :param cache_backend: Cache backend name or instance to use. Refer to \
+        https://requests-cache.readthedocs.io/en/stable/user_guide/backends.html \
+        for more information and allowed values. Defaults to "sqlite".
+    :type cache_backend: str or BaseCache
     """
 
     @typechecked
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        cache_backend: str | BaseCache='sqlite',
+    ) -> None:
         """Constructor method"""
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': USER_AGENT,
+        }
         retries = Retry(
             total=5,
             backoff_factor=0.1,
             status_forcelist=[500, 502, 503, 504]
         )
 
-        self.session = CachedSession(CACHE_NAME, stale_if_error=False)
+        self.session = CachedSession(
+            CACHE_NAME,
+            backend=cache_backend,
+            stale_if_error=False,
+        )
         self.session.mount('https://', HTTPAdapter(max_retries=retries))
-        self.session.headers.update({
-            'Accept': 'application/json',
-            'User-Agent': USER_AGENT,
-        })
+        self.session.headers.update(headers)
 
     @typechecked
     def __repr__(self) -> str:
