@@ -1,6 +1,7 @@
 -r requirements.txt
 build
 codecov
+dotenv
 pylint
 pytest
 pytest-cov
