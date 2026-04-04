@@ -37,7 +37,13 @@ class DataGovSg:
     - Connection retries using exponential backoff. \
         (Reference: https://stackoverflow.com/a/35504626.)
     - Cache (cache duration/expiry is set in ``send_request()``).
+    - API key that can be used with api.data.gov.sg. \
+        Create a key for api.data.gov.sg: \
+        https://guide.data.gov.sg/developer-guide/api-overview/how-to-request-an-api-key.
     - User-agent header.
+
+    :param api_key: The assigned API key for api.data.gov.sg. Defaults to None.
+    :type api_key: str or None
 
     :param cache_backend: Cache backend name or instance to use. Refer to \
         https://requests-cache.readthedocs.io/en/stable/user_guide/backends.html \
@@ -48,6 +54,7 @@ class DataGovSg:
     @typechecked
     def __init__(
         self,
+        api_key: str | None=None,
         cache_backend: str | BaseCache='sqlite',
     ) -> None:
         """Constructor method"""
@@ -55,6 +62,9 @@ class DataGovSg:
             'Accept': 'application/json',
             'User-Agent': USER_AGENT,
         }
+        if api_key is not None:
+            headers['x-api-key'] = api_key
+
         retries = Retry(
             total=5,
             backoff_factor=0.1,
