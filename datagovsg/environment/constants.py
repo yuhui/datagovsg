@@ -31,6 +31,12 @@ UV_INDEX_API_ENDPOINT = f'{BASE_V2_API_ENDPOINT}/uv'
 WIND_DIRECTION_API_ENDPOINT = f'{BASE_V2_API_ENDPOINT}/wind-direction'
 WIND_SPEED_API_ENDPOINT = f'{BASE_V2_API_ENDPOINT}/wind-speed'
 
+WIND_SPEED_SANITISE_IGNORE_KEYS = [
+    'stations[].id',
+    'stations[].deviceId',
+    'readings[].data[].stationId',
+]
+
 __all__ = [
     'AIR_TEMPERATURE_API_ENDPOINT',
     'FOUR_DAY_WEATHER_FORECAST_API_ENDPOINT',
@@ -43,4 +49,6 @@ __all__ = [
     'UV_INDEX_API_ENDPOINT',
     'WIND_DIRECTION_API_ENDPOINT',
     'WIND_SPEED_API_ENDPOINT',
+
+    'WIND_SPEED_SANITISE_IGNORE_KEYS',
 ]

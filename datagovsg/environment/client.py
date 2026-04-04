@@ -14,8 +14,8 @@
 
 """Client for interacting with the Environment APIs."""
 
+from time import sleep
 from typing import Any, Unpack
-from urllib.parse import urlencode
 
 from typeguard import typechecked
 
@@ -27,7 +27,6 @@ from ..constants import (
     CACHE_TWELVE_HOURS,
 )
 from ..datagovsg import DataGovSg
-from ..exceptions import APIError
 from ..types import Url
 
 from .constants import (
@@ -42,6 +41,8 @@ from .constants import (
     UV_INDEX_API_ENDPOINT,
     WIND_DIRECTION_API_ENDPOINT,
     WIND_SPEED_API_ENDPOINT,
+
+    WIND_SPEED_SANITISE_IGNORE_KEYS,
 )
 from .types_args import EnvironmentArgsDict
 from .types import (
@@ -407,11 +408,12 @@ class Client(DataGovSg):
         url: Url,
         params: dict,
         cache_duration: int,
+        sanitise=True,
     ) -> Any:
         """Get environment data from the specified endpoint URL.
 
-        If there are pages of 'readings' data, then compiles all of those \
-            pages into one big list.
+        If there are pages of data, then compile all of those pages into one \
+            big list.
 
         (Since this method has to call `send_request()`, so the parameters \
             are similar to that method's.)
@@ -425,6 +427,10 @@ class Client(DataGovSg):
         :param cache_duration: Number of seconds before the cache expires.
         :type cache_duration: int
 
+        :param sanitise: If true, then the response's values are sanitised \
+            using the ``sanitise_data()`` method. Defaults to True.
+        :type iterate: bool
+
         :return: data from the endpoint, compiling all pages of readings.
         :rtype: Any (but really a dict)
         """
@@ -432,25 +438,25 @@ class Client(DataGovSg):
             url,
             params=params,
             cache_duration=cache_duration,
+            sanitise=sanitise,
         )
 
-        if 'data' not in response:
-            error_message = 'Unexpected error occurred'
-            if 'errorMsg' in response:
-                error_message = response['errorMsg']
-            raise APIError(error_message, response)
-
-        data = response['data']
+        data = response.get('data', {})
 
         if 'paginationToken' in data:
             pagination_token = data.pop('paginationToken')
 
             # Collect the next page of data and append it to this one
             params['paginationToken'] = pagination_token
+
+            # Sleep for a bit to avoid hitting the rate limit
+            sleep(0.5)
+
             response_data = self.__collect_environment_data(
                 url,
                 params=params,
                 cache_duration=cache_duration,
+                sanitise=sanitise,
             )
 
             data_items_name = ''
@@ -465,24 +471,16 @@ class Client(DataGovSg):
 
             # Merge and keep unique values
             data_centre_name = ''
-            data_centre_field = ''
             if 'area_metadata' in data and 'area_metadata' in response_data:
                 data_centre_name = 'area_metadata'
-                data_centre_field = 'name'
             elif 'regionMetadata' in data and 'regionMetadata' in response_data:
                 data_centre_name = 'regionMetadata'
-                data_centre_field = 'name'
             elif 'stations' in data and 'stations' in response_data:
                 data_centre_name = 'stations'
-                data_centre_field = 'id'
-            if data_centre_name != '' and data_centre_field != '':
-                centres = [
-                    centre[data_centre_field] \
-                        for centre in data[data_centre_name]
-                ]
-                for centre in response_data[data_centre_name]:
-                    if centre[data_centre_field] not in centres:
-                        data[data_centre_name].append(centre)
+            if data_centre_name != '':
+                for data_centre in response_data[data_centre_name]:
+                    if data_centre not in data[data_centre_name]:
+                        data[data_centre_name].append(data_centre)
 
         return data
 
