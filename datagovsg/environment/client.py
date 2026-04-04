@@ -79,7 +79,10 @@ class Client(DataGovSg):
         """
         air_temperature: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         air_temperature = self.__collect_environment_data(
             AIR_TEMPERATURE_API_ENDPOINT,
@@ -104,7 +107,10 @@ class Client(DataGovSg):
         """
         pm25: PM25Dict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         pm25 = self.__collect_environment_data(
             PM25_API_ENDPOINT,
@@ -129,7 +135,10 @@ class Client(DataGovSg):
         """
         psi: PSIDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         psi = self.__collect_environment_data(
             PSI_API_ENDPOINT,
@@ -157,7 +166,10 @@ class Client(DataGovSg):
         """
         rainfall: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         rainfall = self.__collect_environment_data(
             RAINFALL_API_ENDPOINT,
@@ -185,7 +197,10 @@ class Client(DataGovSg):
         """
         relative_humidity: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         relative_humidity = self.__collect_environment_data(
             RELATIVE_HUMIDITY_API_ENDPOINT,
@@ -211,7 +226,10 @@ class Client(DataGovSg):
         """
         uv_index: UVIndexDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         uv_index = self.__collect_environment_data(
             UV_INDEX_API_ENDPOINT,
@@ -239,7 +257,10 @@ class Client(DataGovSg):
         """
         two_hour_weather_forecast: WeatherForecastTwoHourDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         two_hour_weather_forecast = self.__collect_environment_data(
             TWO_HOUR_WEATHER_FORECAST_API_ENDPOINT,
@@ -267,7 +288,10 @@ class Client(DataGovSg):
         """
         twenty_four_hour_weather_forecast: WeatherForecastTwentyFourHourDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         twenty_four_hour_weather_forecast = self.__collect_environment_data(
             TWENTY_FOUR_HOUR_WEATHER_FORECAST_API_ENDPOINT,
@@ -295,7 +319,10 @@ class Client(DataGovSg):
         """
         four_day_weather_forecast: WeatherForecastFourDayDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         four_day_weather_forecast = self.__collect_environment_data(
             FOUR_DAY_WEATHER_FORECAST_API_ENDPOINT,
@@ -323,7 +350,10 @@ class Client(DataGovSg):
         """
         wind_direction: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         wind_direction = self.__collect_environment_data(
             WIND_DIRECTION_API_ENDPOINT,
@@ -351,12 +381,21 @@ class Client(DataGovSg):
         """
         wind_speed: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
-        wind_speed = self.__collect_environment_data(
+        data = self.__collect_environment_data(
             WIND_SPEED_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_MINUTE,
+            sanitise=False,
+        )
+
+        wind_speed = self.sanitise_data(
+            data,
+            ignore_keys=WIND_SPEED_SANITISE_IGNORE_KEYS,
         )
 
         return wind_speed
@@ -389,10 +428,9 @@ class Client(DataGovSg):
         :return: data from the endpoint, compiling all pages of readings.
         :rtype: Any (but really a dict)
         """
-        params_str = urlencode(params, safe=':+')
         response = self.send_request(
             url,
-            params=params_str,
+            params=params,
             cache_duration=cache_duration,
         )
 

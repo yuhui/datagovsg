@@ -56,7 +56,10 @@ class Client(DataGovSg):
         """
         taxi_availability: TaxiAvailabilityDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=TransportArgsDict,
+            original_params=kwargs,
+        )
 
         taxi_availability = self.send_request(
             TAXI_AVAILABILITY_API_ENDPOINT,
@@ -85,7 +88,10 @@ class Client(DataGovSg):
         """
         traffic_images: TrafficImagesDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=TransportArgsDict,
+            original_params=kwargs,
+        )
 
         traffic_images = self.send_request(
             TRAFFIC_IMAGES_API_ENDPOINT,

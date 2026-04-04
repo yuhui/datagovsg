@@ -50,7 +50,10 @@ class Client(DataGovSg):
         """
         carpark_availability: CarparkAvailabilityDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=HousingArgsDict,
+            original_params=kwargs,
+        )
 
         carpark_availability = self.send_request(
             CARPARK_AVAILABILITY_API_ENDPOINT,

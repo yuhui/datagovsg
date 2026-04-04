@@ -55,7 +55,10 @@ class Client(DataGovSg):
         """
         designs: DesignsDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EconomyArgsDict,
+            original_params=kwargs,
+        )
 
         designs = self.send_request(
             IPOS_DESIGNS_API_ENDPOINT,
@@ -80,7 +83,10 @@ class Client(DataGovSg):
         """
         patents: PatentsDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EconomyArgsDict,
+            original_params=kwargs,
+        )
 
         patents = self.send_request(
             IPOS_PATENTS_API_ENDPOINT,
@@ -105,7 +111,10 @@ class Client(DataGovSg):
         """
         trademarks: TrademarksDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EconomyArgsDict,
+            original_params=kwargs,
+        )
 
         trademarks = self.send_request(
             IPOS_TRADEMARKS_API_ENDPOINT,
