@@ -14,7 +14,6 @@
 
 from datetime import datetime
 
-from .ckan import Client as Ckan
 from .economy import Client as Economy
 from .environment import Client as Environment
 from .housing import Client as Housing
@@ -27,7 +26,6 @@ AUTHOR = 'Yuhui'
 AUTHOR_EMAIL = 'yuhuibc@gmail.com'
 
 __all__ = [
-    'Ckan',
     'Economy',
     'Environment',
     'Housing',

@@ -18,9 +18,6 @@ The four clients are: ``Economy``, ``Environment``, ``Housing`` and
     The old ``Transport`` client has been separated into ``Housing`` and
     ``Transport``.
 
-    `Data.gov.sg`_ no longer provides endpoints for CKAN, so the ``Ckan``
-    client has been deprecated.
-
 Each client contains several public functions, one function per endpoint. A
 function's name is the same as its corresponding endpoint's ending path.
 
