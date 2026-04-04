@@ -21,7 +21,11 @@ from typeguard import typechecked
 from ..constants import CACHE_ONE_MINUTE
 from ..datagovsg import DataGovSg
 
-from .constants import CARPARK_AVAILABILITY_API_ENDPOINT
+from .constants import (
+    CARPARK_AVAILABILITY_API_ENDPOINT,
+
+    CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS,
+)
 from .types_args import HousingArgsDict
 from .types import CarparkAvailabilityDict
 
@@ -55,11 +59,18 @@ class Client(DataGovSg):
             original_params=kwargs,
         )
 
-        carpark_availability = self.send_request(
+        data = self.send_request(
             CARPARK_AVAILABILITY_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_MINUTE,
-            sanitise_numbers=True,
+            sanitise=False,
+        )
+
+        items = data.get('items', [])
+
+        carpark_availability = self.sanitise_data(
+            items,
+            ignore_keys=CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS,
         )
 
         return carpark_availability

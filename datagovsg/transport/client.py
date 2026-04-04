@@ -24,6 +24,8 @@ from ..datagovsg import DataGovSg
 from .constants import (
     TAXI_AVAILABILITY_API_ENDPOINT,
     TRAFFIC_IMAGES_API_ENDPOINT,
+
+    TRAFFIC_IMAGES_SANITISE_IGNORE_KEYS,
 )
 from .types_args import TransportArgsDict
 from .types import (
@@ -93,10 +95,18 @@ class Client(DataGovSg):
             original_params=kwargs,
         )
 
-        traffic_images = self.send_request(
+        data = self.send_request(
             TRAFFIC_IMAGES_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_MINUTE,
+            sanitise=False,
+        )
+
+        items = data.get('items', [])
+
+        traffic_images = self.sanitise_data(
+            items,
+            ignore_keys=TRAFFIC_IMAGES_SANITISE_IGNORE_KEYS,
         )
 
         return traffic_images
