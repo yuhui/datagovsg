@@ -147,12 +147,19 @@ class DataGovSg:
         self,
         value: Any,
         iterate: bool=True,
-        sanitise_numbers: bool=False,
+        ignore_keys: list[str] | None=None,
+        key_path: str='',
     ) -> Any:
         """Convert the following:
 
+        - If ``iterate`` is True and value is a ``dict`` or ``list``: \
+            sanitise the value's contents.
+        - Blank string: convert to None.
         - String that is like date or datetime: convert to ``datetime.date`` \
             or ``datetime.datetime`` object respectively.
+        - String that is number-like: convert to ``int`` or ``float`` \
+            appropriately.
+        - Finally: Leave the value as-is.
 
         :param value: Value to sanitise.
         :type value: Any
@@ -161,14 +168,20 @@ class DataGovSg:
             sanitised recursively. Defaults to True.
         :type iterate: bool
 
-        :param sanitise_numbers: If True, then strings that are like numbers \
-            are converted to ``int`` or ``float`` appropriately. Defaults to \
-            False.
-        :type sanitise_numbers: bool
+        :param ignore_keys: List of dict keys to ignore when sanitising, if \
+            value is a ``dict``. Defaults to [].
+        :type ignore_keys: list[str]
+
+        :param key_path: Current path of key in the dict. Defaults to blank \
+            string.
+        :type key_path: str
 
         :return: The sanitised value.
         :rtype: Any
         """
+        if ignore_keys is None:
+            ignore_keys = []
+
         sanitised_value: Any = value
 
         if iterate and isinstance(value, list):
@@ -176,25 +189,35 @@ class DataGovSg:
                 self.sanitise_data(
                     v,
                     iterate=iterate,
-                    sanitise_numbers=sanitise_numbers,
+                    ignore_keys=ignore_keys,
+                    key_path=f'{key_path}[]'
                 ) for v in value
             ]
         elif iterate and isinstance(value, dict):
             sanitised_value = {}
             for k, v in value.items():
-                sanitised_value[k] = self.sanitise_data(
-                    v,
-                    iterate=iterate,
-                    sanitise_numbers=sanitise_numbers,
-                )
+                current_key_path = '.'.join([key_path, k]) if key_path else k
+                if isinstance(v, str) and v == '':
+                    sanitised_value[k] = self.sanitise_data(v)
+                elif current_key_path in ignore_keys:
+                    sanitised_value[k] = v
+                else:
+                    sanitised_value[k] = self.sanitise_data(
+                        v,
+                        iterate=iterate,
+                        ignore_keys=ignore_keys,
+                        key_path=current_key_path,
+                    )
         elif isinstance(value, str):
-            try:
-                # pylint: disable=broad-exception-caught
+            if value == '':
+                sanitised_value = None
+            else:
+                try:
+                    # pylint: disable=broad-exception-caught
 
-                # Convert to a date/datetime.
-                sanitised_value = datetime_from_string(value)
-            except Exception:
-                if sanitise_numbers:
+                    # Convert to a date/datetime.
+                    sanitised_value = datetime_from_string(value)
+                except Exception:
                     try:
                         # Convert to an integer
                         sanitised_value = int(value)
