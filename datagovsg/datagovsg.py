@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from requests_cache import BaseCache, CachedSession
 from typeguard import check_type, typechecked
 
 from .constants import CACHE_NAME, USER_AGENT
+from .exceptions import APIError
 from .timezone import datetime_from_string
 from .types import Url
 
@@ -82,7 +83,7 @@ class DataGovSg:
     @typechecked
     def __repr__(self) -> str:
         """String representation"""
-        return f'{self.__class__}'
+        return f'{self.__class__} ({USER_AGENT})'
 
     @typechecked
     def build_params(
