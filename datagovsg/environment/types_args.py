@@ -15,11 +15,7 @@
 """Data.gov.sg custom types for Environment client methods' arguments."""
 
 from datetime import date, datetime
-from typing import NotRequired
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import NotRequired, TypedDict
 
 class EnvironmentArgsDict(TypedDict):
     """Type definition for Environment methods' input arguments"""

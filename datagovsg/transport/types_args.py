@@ -15,11 +15,7 @@
 """Data.gov.sg custom types for Transport client methods' arguments."""
 
 from datetime import datetime
-from typing import NotRequired
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import NotRequired, TypedDict
 
 class TransportArgsDict(TypedDict):
     """Type definition for taxi_availability() and traffic_images() input \

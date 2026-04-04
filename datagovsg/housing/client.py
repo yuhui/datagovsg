@@ -27,7 +27,7 @@ from .constants import (
     CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS,
 )
 from .types_args import HousingArgsDict
-from .types import CarparkAvailabilityDict
+from .types import CarparkAvailabilityItemDict
 
 class Client(DataGovSg):
     """Interact with the housing-related endpoints.
@@ -40,7 +40,7 @@ class Client(DataGovSg):
     def carpark_availability(
         self,
         **kwargs: Unpack[HousingArgsDict],
-    ) -> CarparkAvailabilityDict:
+    ) -> list[CarparkAvailabilityItemDict]:
         """Get the latest carpark availability in Singapore.
 
         Retrieved every minute.
@@ -52,7 +52,7 @@ class Client(DataGovSg):
         :return: Available carpark spaces. (Cached for 1 minute.)
         :rtype: CarparkAvailabilityDict
         """
-        carpark_availability: CarparkAvailabilityDict
+        carpark_availability: list[CarparkAvailabilityItemDict]
 
         params = self.build_params(
             params_expected_type=HousingArgsDict,

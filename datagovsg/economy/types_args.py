@@ -15,11 +15,7 @@
 """Data.gov.sg custom types for Economy client methods' arguments."""
 
 from datetime import date
-from typing import NotRequired
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import NotRequired, TypedDict
 
 class EconomyArgsDict(TypedDict):
     """Type definition for designs(), patents() and trademarks() input \

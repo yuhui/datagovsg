@@ -15,11 +15,7 @@
 """Data.gov.sg custom types for Housing client methods' arguments."""
 
 from datetime import datetime
-from typing import NotRequired
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import NotRequired, TypedDict
 
 class HousingArgsDict(TypedDict):
     """Type definition for carpark_availability() input arguments"""

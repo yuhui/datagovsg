@@ -15,12 +15,12 @@
 """Client mixin for interacting with all of the API endpoints."""
 
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any
 
 from requests import codes as requests_codes
 from requests.adapters import HTTPAdapter, Retry
-from typeguard import typechecked
 from requests_cache import BaseCache, CachedSession
+from typeguard import check_type, typechecked
 
 from .constants import CACHE_NAME, USER_AGENT
 from .timezone import datetime_from_string

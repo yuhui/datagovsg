@@ -15,10 +15,7 @@
 """Data.gov.sg custom types for Housing client methods' responses."""
 
 from datetime import datetime
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import TypedDict
 
 # Carpark Availability
 
@@ -58,7 +55,7 @@ class _CarparkAvailabilityItemDataDict(TypedDict):
         tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
     """
 
-class _CarparkAvailabilityItemDict(TypedDict):
+class CarparkAvailabilityItemDict(TypedDict):
     """Type definition for CarparkAvailabilityDict"""
 
     timestamp: datetime
@@ -70,12 +67,6 @@ class _CarparkAvailabilityItemDict(TypedDict):
     carpark_data: list[_CarparkAvailabilityItemDataDict]
     """Carpark availability information per carpark."""
 
-class CarparkAvailabilityDict(TypedDict):
-    """Type definition for carpark_availability()"""
-
-    items: list[_CarparkAvailabilityItemDict]
-    """Items."""
-
 __all__ = [
-    'CarparkAvailabilityDict',
+    'CarparkAvailabilityItemDict',
 ]

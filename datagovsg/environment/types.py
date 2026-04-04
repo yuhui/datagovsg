@@ -15,15 +15,11 @@
 """Data.gov.sg custom types for Environment client methods' responses."""
 
 from datetime import date, datetime
-from typing import NotRequired
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import NotRequired, TypedDict
 
 # Common types
 
-class _LabelLocationDict(TypedDict):
+class _LocationDict(TypedDict):
     """Type definition for various custom types"""
 
     latitude: float
@@ -45,7 +41,7 @@ class _AreaMetadataDict(TypedDict):
 
     :example: "Ang Mo Kio"
     """
-    label_location: _LabelLocationDict
+    label_location: _LocationDict
     """Provides longitude and latitude for placing readings on a map."""
 
 class _RegionMetadataDict(TypedDict):
@@ -56,7 +52,7 @@ class _RegionMetadataDict(TypedDict):
 
     :example: "West"
     """
-    labelLocation: _LabelLocationDict
+    labelLocation: _LocationDict
     """Provides longitude and latitude for placing readings on a map."""
 
 class _RegionReadingsDict(TypedDict):
@@ -111,7 +107,7 @@ class _StationDict(TypedDict):
 
     :example: "Marina Gardens Drive"
     """
-    labelLocation: _LabelLocationDict
+    labelLocation: _LocationDict
     """Provides longitude and latitude for placing readings on a map."""
 
 class _StationReadingDataDict(TypedDict):
@@ -154,19 +150,9 @@ class _WeatherForecastLowHighDict(TypedDict):
     :example: 30
     """
 
-class _WeatherForecastLowHighUnitDict(TypedDict):
+class _WeatherForecastLowHighUnitDict(_WeatherForecastLowHighDict):
     """Type definition for various custom types"""
 
-    low: int | float
-    """Low value.
-
-    :example: 26
-    """
-    high: int | float
-    """High value.
-
-    :example: 36
-    """
     unit: str
     """Unit of measure."""
 
@@ -219,7 +205,7 @@ class _WindSpeedStationDict(TypedDict):
 
     :example: "Marina Gardens Drive"
     """
-    location: _LabelLocationDict
+    location: _LocationDict
     """Label location."""
 
 class EnvironmentReadingDict(TypedDict):

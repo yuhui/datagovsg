@@ -30,7 +30,7 @@ from .constants import (
 from .types_args import TransportArgsDict
 from .types import (
     TaxiAvailabilityDict,
-    TrafficImagesDict,
+    TrafficImagesItemDict,
 )
 
 class Client(DataGovSg):
@@ -75,7 +75,7 @@ class Client(DataGovSg):
     def traffic_images(
         self,
         **kwargs: Unpack[TransportArgsDict],
-    ) -> TrafficImagesDict:
+    ) -> list[TrafficImagesItemDict]:
         """Get the latest images from traffic cameras all around Singapore.
 
         Retrieved every 20 seconds from LTA's Datamall. But it is recommended \
@@ -86,9 +86,9 @@ class Client(DataGovSg):
         :type kwargs: TransportArgsDict
 
         :return: Images from traffic cameras. (Cached for 1 minute.)
-        :rtype: TrafficImagesDict
+        :rtype: list[TrafficImagesItemDict]
         """
-        traffic_images: TrafficImagesDict
+        traffic_images: list[TrafficImagesItemDict]
 
         params = self.build_params(
             params_expected_type=TransportArgsDict,
