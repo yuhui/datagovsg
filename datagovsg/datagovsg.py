@@ -234,26 +234,26 @@ class DataGovSg:
     def send_request(
         self,
         url: Url,
-        params: Optional[dict | str]=None,
-        cache_duration: Optional[int]=0,
+        params: dict | None=None,
+        cache_duration: int=0,
         sanitise: bool=True,
-        sanitise_numbers: bool=False,
+        sanitise_ignore_keys: list[str] | None=None,
     ) -> Any:
-        """Send a request to an endpoint.
+        """Send a request to an endpoint and return its response.
 
         Normally, this method does not need to be called directly. However, \
-            if SingStat were to change their API specification but this \
+            if Data.gov.sg were to change their API specification but this \
             package has not yet been updated to support that change, then \
             applications may use this method to call the changed endpoints.
 
         :param url: The endpoint URL to send the request to.
         :type url: Url
 
-        :param params: List of parameters or parameter string to be passed to \
-            the endpoint URL. Parameter names **must** match the names \
-            required by the endpoints, particularly with typecase (e.g. \
-            camelCase). Defaults to None.
-        :type params: dict | str
+        :param params: List of parameters to be passed to the endpoint URL. \
+            Parameter names **must** match the names required by the \
+            endpoints, particularly with typecase (e.g. camelCase). Defaults \
+            to {}.
+        :type params: dict
 
         :param cache_duration: Number of seconds before the cache expires. \
             Defaults to 0, i.e. do not cache.
@@ -261,16 +261,16 @@ class DataGovSg:
 
         :param sanitise: If true, then the response's values are sanitised \
             using the ``sanitise_data()`` method. Defaults to True.
-        :type iterate: bool
+        :type sanitise: bool
 
-        :param sanitise_numbers: If True, then sanitises number-like strings. \
-            Applicable only when ``sanitise`` argument is True. Defaults to \
-            False.
-        :type sanitise_numbers: bool
+        :param sanitise_ignore_keys: List of keys to ignore in the response \
+            value during sanitising when that response value is a ``dict``. \
+            Defaults to [].
+        :type sanitise_ignore_keys: list[str]
 
         :raises HTTPError: Error occurred during the request process.
 
-        :return: Response JSON content of the request.
+        :return: Results from the response.
         :rtype: Any
         """
         data: Any
@@ -278,13 +278,54 @@ class DataGovSg:
         if params is None:
             params = {}
 
+        if sanitise_ignore_keys is None:
+            sanitise_ignore_keys = []
+
+        response_val = self.__collect_response_value(
+            url,
+            params=params,
+            cache_duration=cache_duration,
+        )
+
+        data = self.sanitise_data(
+            response_val,
+            ignore_keys=sanitise_ignore_keys,
+        ) if sanitise else response_val
+
+        return data
+
+# private
+
+    @typechecked
+    def __collect_response_value(
+        self,
+        url: Url,
+        params: dict,
+        cache_duration: int,
+    ) -> Any:
+        """Collect response value from an endpoint.
+
+        :param url: The endpoint URL to send the request to.
+        :type url: Url
+
+        :param params: List of parameters to be passed to the endpoint URL.
+        :type params: dict
+
+        :param cache_duration: Number of seconds before the cache expires.
+        :type cache_duration: int
+
+        :raises HTTPError: Error occurred during the request process.
+
+        :return: Results from the response.
+        :rtype: Any
+        """
+        response_value: Any
+
         response = self.session.get(
             url,
             params=params,
             expire_after=cache_duration,
         )
-        if response.status_code != requests_codes['ok']:
-            response.raise_for_status()
 
         response_json = {}
         try:
@@ -292,12 +333,35 @@ class DataGovSg:
         except ValueError:
             pass
 
-        data = self.sanitise_data(
-            response_json,
-            sanitise_numbers=sanitise_numbers,
-        ) if sanitise else response_json
+        if response.status_code == requests_codes['bad_request'] \
+            or response.status_code == requests_codes['not_found'] \
+            or response.status_code == requests_codes['too_many_requests']:
+            error_message = response_json.get(
+                'errorMsg',
+                'Unexpected error occurred',
+            )
+            raise APIError(
+                message=error_message,
+                data=response_json,
+            )
 
-        return data
+        if response.status_code != requests_codes['ok']:
+            response.raise_for_status()
+
+        # handle Data.gov.sg API's default response
+        if response_json.get('code', 0) != 0:
+            error_message = response_json.get(
+                'message',
+                'Unexpected error occurred',
+            )
+            raise APIError(
+                message=error_message,
+                data=response_json,
+            )
+
+        response_value = response_json
+
+        return response_value
 
 __all__ = [
     'DataGovSg',
