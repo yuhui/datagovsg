@@ -45,15 +45,15 @@ ALLOWED_DATE_FORMATS = (
 
 @typechecked
 def datetime_as_sgt(dt: datetime) -> datetime:
-    """Set a datetime with the SGT timezone and return the datetime.
+    """Update a datetime to use the SGT timezone and return the datetime.
 
-    :param dt: Datetime to convert to SGT timezone.
+    :param dt: Datetime to update to use SGT timezone.
     :type dt: datetime
 
     :return: The datetime in SGT timezone.
     :rtype: datetime
     """
-    dt_sg: datetime = dt.astimezone(ZoneInfo('Asia/Singapore'))
+    dt_sg: datetime = dt.replace(tzinfo=ZoneInfo('Asia/Singapore'))
     return dt_sg
 
 @typechecked
