@@ -87,37 +87,58 @@ class DataGovSg:
     @typechecked
     def build_params(
         self,
+        params_expected_type: Any,
         original_params: Any,
         default_params: dict | None=None,
+        key_map: dict[str, str] | None=None,
     ) -> dict:
         """Build the list of parameters that are compatible for use with the \
-            endpoint URLs, e.g. datetime objects to strings.
+            endpoint URLs, e.g. camelCase parameter names instead of Python's \
+            snake_case, datetime objects to strings.
+
+        :param params_expected_type: The expected type of \
+            ``original_params``. Should be one of the importable types from \
+            the client's ``types_args``.
+        :type params_expected_type: Any
 
         :param original_params: The set of parameters to use for building.
         :type original_params: Any but should really be dict
 
-        :param default_params: The set of parameters' default values. \
-            Defaults to None.
+        :param default_params: The set of parameters' default values. Should \
+            be of the same type as what is specified in \
+            ``params_expected_type``. Defaults to None.
         :type default_params: dict or None
+
+        :param key_map: Mapping of keys used in ``params_expected_types`` to \
+            keys expected by the endpoint. Defaults to None.
+        :type key_map: dict[str, str] or None
 
         :return: The set of parameters that can be used with the API endpoints.
         :rtype: dict
         """
         if default_params is None:
             default_params = {}
+        if key_map is None:
+            key_map = {}
+
         joined_params = default_params | original_params
+
+        # Ensure that the parameters match the expected input parameter types.
+        _ = check_type(joined_params, params_expected_type)
 
         params: dict = {}
         for key, value in joined_params.items():
+            param_key = key_map[key] if key in key_map else key
+
             # Convert date and datetime to ISO format strings
             # Leave all other types as-is
             # IMPORTANT! Test for `datetime` before `date`!
             if isinstance(value, datetime):
-                params[key] = value.strftime('%Y-%m-%dT%H:%M:%S')
+                params[param_key] = value.strftime('%Y-%m-%dT%H:%M:%S')
             elif isinstance(value, date):
-                params[key] = value.isoformat()
+                params[param_key] = value.strftime('%Y-%m-%d')
             else:
-                params[key] = value
+                params[param_key] = value
 
         return params
 
