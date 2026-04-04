@@ -47,17 +47,7 @@ taxi_availability()
 traffic_images()
 ----------------
 
-.. autoclass:: TrafficImagesDict
-   :members:
-   :member-order: bysource
-   :show-inheritance:
-
-   .. py:attribute:: items
-      :type: list[_TrafficImagesItemDict]
-
-      Items.
-
-.. autoclass:: _TrafficImagesItemDict
+.. autoclass:: TrafficImagesItemDict
    :members:
    :member-order: bysource
    :show-inheritance:

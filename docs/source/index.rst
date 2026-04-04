@@ -34,7 +34,7 @@ Installing the package
 
 Install the package using ``pip``::
 
-    pip install datagovsg
+    python -m pip install datagovsg
 
 Using the package
 -----------------

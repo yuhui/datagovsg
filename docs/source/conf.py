@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,9 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 
-from datagovsg import NAME, AUTHOR, VERSION
+from datagovsg.constants import NAME
+from datagovsg.author import AUTHOR
+from datagovsg.version import VERSION
 
 
 # -- Project information -----------------------------------------------------
