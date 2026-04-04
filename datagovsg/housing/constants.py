@@ -1,4 +1,4 @@
-# Copyright 2025 Yuhui
+# Copyright 2025-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,12 @@ TRANSPORT_API_ENDPOINT = f'{BASE_V1_API_ENDPOINT}/transport'
 CARPARK_AVAILABILITY_API_ENDPOINT = \
     f'{TRANSPORT_API_ENDPOINT}/carpark-availability'
 
+CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS = [
+    '[].carpark_data[].carpark_number',
+]
+
 __all__ = [
     'CARPARK_AVAILABILITY_API_ENDPOINT',
+
+    'CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS',
 ]

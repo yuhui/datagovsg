@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,13 @@ TRANSPORT_API_ENDPOINT = f'{BASE_V1_API_ENDPOINT}/transport'
 TAXI_AVAILABILITY_API_ENDPOINT = f'{TRANSPORT_API_ENDPOINT}/taxi-availability'
 TRAFFIC_IMAGES_API_ENDPOINT = f'{TRANSPORT_API_ENDPOINT}/traffic-images'
 
+TRAFFIC_IMAGES_SANITISE_IGNORE_KEYS = [
+    '[].cameras[].camera_id',
+]
+
 __all__ = [
     'TAXI_AVAILABILITY_API_ENDPOINT',
     'TRAFFIC_IMAGES_API_ENDPOINT',
+
+    'TRAFFIC_IMAGES_SANITISE_IGNORE_KEYS',
 ]

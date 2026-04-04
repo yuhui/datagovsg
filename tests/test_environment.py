@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,45 +18,157 @@
 
 from datetime import date, datetime, time, timedelta
 from time import sleep
+from os import getenv
+from unittest.mock import Mock
 from zoneinfo import ZoneInfo
 
 import pytest
+from dotenv import load_dotenv
+from requests_cache import CachedSession
+from typeguard import check_type
 
 from datagovsg import Environment
+from datagovsg.environment.types import (
+    EnvironmentReadingDict,
+    PM25Dict,
+    PSIDict,
+    UVIndexDict,
+    WeatherDict,
+    WeatherForecastTwoHourDict,
+    WeatherForecastTwentyFourHourDict,
+    WeatherForecastFourDayDict,
+)
 
-METHODS_RETURNING_ENVIRONMENT_READINGS_PER_MINUTE = [
-    'air_temperature',
-    'rainfall',
-    'relative_humidity',
-    'wind_direction',
-    'wind_speed',
-]
-METHODS_RETURNING_ENVIRONMENT_ITEMS_PER_HOUR = [
-    'pm25',
-    'psi',
-]
-METHODS_RETURNING_ENVIRONMENT_RECORDS_PER_HOUR = [
-    'uv_index',
-]
-METHODS_RETURNING_ENVIRONMENT_READINGS = \
-    METHODS_RETURNING_ENVIRONMENT_READINGS_PER_MINUTE \
-    + METHODS_RETURNING_ENVIRONMENT_ITEMS_PER_HOUR \
-    + METHODS_RETURNING_ENVIRONMENT_RECORDS_PER_HOUR
-TEST_DATE = date.today() - timedelta(1)
+from .mocks.api_response_environment import (
+    APIResponseAirTemperature,
+    APIResponseAirTemperaturePage1,
+    APIResponseAirTemperaturePage2,
+    APIResponseAirTemperaturePage3,
+    APIResponseFloodAlerts,
+    APIResponseLightning,
+    APIResponsePM25,
+    APIResponsePM25Page1,
+    APIResponsePM25Page2,
+    APIResponsePM25Page3,
+    APIResponsePSI,
+    APIResponseRainfall,
+    APIResponseRelativeHumidity,
+    APIResponseUVIndex,
+    APIResponseUVIndexPage1,
+    APIResponseUVIndexPage2,
+    APIResponseUVIndexPage3,
+    APIResponseWBGT,
+    APIResponseTwoHourWeatherForecast,
+    APIResponseTwoHourWeatherForecastPage1,
+    APIResponseTwoHourWeatherForecastPage2,
+    APIResponseTwentyFourHourWeatherForecast,
+    APIResponseFourDayWeatherForecast,
+    APIResponseWindDirection,
+    APIResponseWindSpeed,
+)
+
+TEST_DATE = date(2026, 1, 12)
 TEST_DATETIME = datetime.combine(
     TEST_DATE,
-    time(23, 45, 16, tzinfo=ZoneInfo('Asia/Singapore'))
+    time(10, 15, 0, tzinfo=ZoneInfo('Asia/Singapore'))
 )
+TEST_DATE_YESTERDAY = TEST_DATE - timedelta(days=1)
+TEST_DATE_STRING = TEST_DATE.strftime('%Y-%m-%d')
+TEST_DATETIME_STRING = TEST_DATETIME.strftime('%Y-%m-%dT%H:%M:%S')
+
+TEST_PARAMETERS_AND_MOCKS = [
+    (
+        'air_temperature',
+        EnvironmentReadingDict,
+        APIResponseAirTemperature,
+    ),
+    (
+        'flood_alerts',
+        WeatherDict,
+        APIResponseFloodAlerts,
+    ),
+    (
+        'lightning',
+        WeatherDict,
+        APIResponseLightning,
+    ),
+    (
+        'pm25',
+        PM25Dict,
+        APIResponsePM25,
+    ),
+    (
+        'psi',
+        PSIDict,
+        APIResponsePSI,
+    ),
+    (
+        'rainfall',
+        EnvironmentReadingDict,
+        APIResponseRainfall,
+    ),
+    (
+        'relative_humidity',
+        EnvironmentReadingDict,
+        APIResponseRelativeHumidity,
+    ),
+    (
+        'uv_index',
+        UVIndexDict,
+        APIResponseUVIndex,
+    ),
+    (
+        'wbgt',
+        WeatherDict,
+        APIResponseWBGT,
+    ),
+    (
+        'two_hour_weather_forecast',
+        WeatherForecastTwoHourDict,
+        APIResponseTwoHourWeatherForecast,
+    ),
+    (
+        'twenty_four_hour_weather_forecast',
+        WeatherForecastTwentyFourHourDict,
+        APIResponseTwentyFourHourWeatherForecast,
+    ),
+    (
+        'four_day_weather_forecast',
+        WeatherForecastFourDayDict,
+        APIResponseFourDayWeatherForecast,
+    ),
+    (
+        'wind_direction',
+        EnvironmentReadingDict,
+        APIResponseWindDirection,
+    ),
+    (
+        'wind_speed',
+        EnvironmentReadingDict,
+        APIResponseWindSpeed,
+    ),
+]
 
 @pytest.fixture(scope='module')
 def client():
-    return Environment()
+    load_dotenv()
+    api_key = getenv('DATAGOVSG_API_KEY')
+    return Environment(api_key)
 
 @pytest.mark.parametrize(
-    ('method'),
-    METHODS_RETURNING_ENVIRONMENT_READINGS,
+    (
+        'method',
+        'expected_type',
+        'mocked_response_method',
+    ),
+    TEST_PARAMETERS_AND_MOCKS,
 )
-def test_environment_readings(client, method):
+def test_environment_methods(
+    client,
+    method,
+    expected_type,
+    mocked_response_method,
+):
     try:
         data = getattr(client, method, None)()
     except Exception:
@@ -64,145 +176,131 @@ def test_environment_readings(client, method):
         sleep(5)
         data = getattr(client, method, None)()
 
-    assert data is not None
+    assert check_type(data, expected_type) == data
 
 @pytest.mark.parametrize(
-    ('method', 'data_items_name'),
-    [
-        (method, 'readings') \
-            for method in METHODS_RETURNING_ENVIRONMENT_READINGS_PER_MINUTE
-    ]
-    + [
-        (method, 'items') \
-            for method in METHODS_RETURNING_ENVIRONMENT_ITEMS_PER_HOUR
-    ]
-    + [
-        (method, 'records') \
-            for method in METHODS_RETURNING_ENVIRONMENT_RECORDS_PER_HOUR
-    ],
+    (
+        'method',
+        'expected_type',
+        'mocked_response_method',
+    ),
+    TEST_PARAMETERS_AND_MOCKS,
 )
-def test_environment_readings_with_date(client, method, data_items_name):
-    try:
-        data = getattr(client, method, None)(date=TEST_DATE)
-    except Exception:
-        # try again
-        sleep(5)
-        data = getattr(client, method, None)(date=TEST_DATE)
+def test_environment_methods_with_date(
+    client,
+    method,
+    expected_type,
+    mocked_response_method,
+    monkeypatch,
+):
+    def mock_requests_get(*args, **kwargs):
+        return mocked_response_method()
 
-    assert all(
-        data_item['timestamp'].date() == TEST_DATE \
-            for data_item in data[data_items_name]
-    )
+    monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
+
+    original_send_request = client.send_request
+    client.send_request = Mock(side_effect=original_send_request)
+
+    _ = getattr(client, method, None)(date=TEST_DATE)
+
+    client.send_request.assert_called_once()
+    _, kwargs = client.send_request.call_args
+    assert kwargs['params']['date'] == TEST_DATE_STRING
 
 @pytest.mark.parametrize(
-    ('method', 'data_items_name'),
-    [
-        (method, 'readings') \
-            for method in METHODS_RETURNING_ENVIRONMENT_READINGS_PER_MINUTE
-    ]
-    + [
-        (method, 'items') \
-            for method in METHODS_RETURNING_ENVIRONMENT_ITEMS_PER_HOUR
-    ]
-    + [
-        (method, 'records') \
-            for method in METHODS_RETURNING_ENVIRONMENT_RECORDS_PER_HOUR
-    ],
+    (
+        'method',
+        'expected_type',
+        'mocked_response_method',
+    ),
+    TEST_PARAMETERS_AND_MOCKS,
 )
-def test_environment_readings_with_datetime(client, method, data_items_name):
-    try:
-        data = getattr(client, method, None)(date=TEST_DATETIME)
-    except Exception:
-        # try again
-        sleep(5)
-        data = getattr(client, method, None)(date=TEST_DATETIME)
+def test_environment_methods_with_datetime(
+    client,
+    method,
+    expected_type,
+    mocked_response_method,
+    monkeypatch,
+):
+    def mock_requests_get(*args, **kwargs):
+        return mocked_response_method()
 
-    assert len(data[data_items_name]) == 1
+    monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 
-    timestamp = data[data_items_name][0]['timestamp']
-    assert timestamp <= TEST_DATETIME
+    original_send_request = client.send_request
+    client.send_request = Mock(side_effect=original_send_request)
 
-def test_two_hour_weather_forecast(client):
-    two_hour_weather_forecast = client.two_hour_weather_forecast()
+    _ = getattr(client, method, None)(date=TEST_DATETIME)
 
-    assert two_hour_weather_forecast is not None
+    client.send_request.assert_called_once()
+    _, kwargs = client.send_request.call_args
+    assert kwargs['params']['date'] == TEST_DATETIME_STRING
 
-def test_two_hour_weather_forecast_with_date(client):
-    two_hour_weather_forecast = client.two_hour_weather_forecast(
-        date=TEST_DATE,
-    )
+def test_air_temperature_with_pagination(client, monkeypatch):
+    def mock_requests_get(*args, **kwargs):
+        params = kwargs.get('params', {})
+        pagination_token = params.get('paginationToken', None)
+        if pagination_token is None:
+            return APIResponseAirTemperaturePage1()
+        elif pagination_token == 'b2Zmc2V0PTI1':
+            return APIResponseAirTemperaturePage2()
+        elif pagination_token == 'b2Zmc2V0PTUw':
+            return APIResponseAirTemperaturePage3()
 
-    assert all(
-        item['timestamp'].date() <= TEST_DATE \
-            for item in two_hour_weather_forecast['items']
-    )
+    monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 
-def test_two_hour_weather_forecast_with_datetime(client):
-    two_hour_weather_forecast = client.two_hour_weather_forecast(
-        date=TEST_DATETIME,
-    )
+    data = client.air_temperature()
 
-    assert len(two_hour_weather_forecast['items']) == 1
+    assert len(data['stations']) == 8
+    assert len(data['readings']) == 9
 
-    item = two_hour_weather_forecast['items'][0]
+def test_pm25_with_pagination(client, monkeypatch):
+    def mock_requests_get(*args, **kwargs):
+        params = kwargs.get('params', {})
+        pagination_token = params.get('paginationToken', None)
+        if pagination_token is None:
+            return APIResponsePM25Page1()
+        elif pagination_token == 'b2Zmc2V0PTI1':
+            return APIResponsePM25Page2()
+        elif pagination_token == 'b2Zmc2V0PTUw':
+            return APIResponsePM25Page3()
 
-    assert item['timestamp'] <= TEST_DATETIME
+    monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 
-def test_twenty_four_hour_weather_forecast(client):
-    twenty_four_hour_weather_forecast = \
-        client.twenty_four_hour_weather_forecast()
+    data = client.pm25()
 
-    assert twenty_four_hour_weather_forecast is not None
+    assert len(data['regionMetadata']) == 5
+    assert len(data['items']) == 6
 
-def test_twenty_four_hour_weather_forecast_with_date(client):
-    twenty_four_hour_weather_forecast = \
-        client.twenty_four_hour_weather_forecast(date=TEST_DATE)
+def test_two_hour_weather_forecast_with_pagination(client, monkeypatch):
+    def mock_requests_get(*args, **kwargs):
+        params = kwargs.get('params', {})
+        pagination_token = params.get('paginationToken', None)
+        if pagination_token is None:
+            return APIResponseTwoHourWeatherForecastPage1()
+        elif pagination_token == 'b2Zmc2V0PTI1':
+            return APIResponseTwoHourWeatherForecastPage2()
 
-    for record in twenty_four_hour_weather_forecast['records']:
-        assert all(
-            TEST_DATE <= period['timePeriod']['end'].date() \
-                for period in record['periods']
-        )
+    monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 
-def test_twenty_four_hour_weather_forecast_with_datetime(client):
-    twenty_four_hour_weather_forecast = \
-        client.twenty_four_hour_weather_forecast(date=TEST_DATETIME)
+    data = client.two_hour_weather_forecast()
 
-    assert len(twenty_four_hour_weather_forecast['records']) == 1
+    assert len(data['area_metadata']) == 4
+    assert len(data['items']) == 8
 
-    record = twenty_four_hour_weather_forecast['records'][0]
+def test_uv_index_with_pagination(client, monkeypatch):
+    def mock_requests_get(*args, **kwargs):
+        params = kwargs.get('params', {})
+        pagination_token = params.get('paginationToken', None)
+        if pagination_token is None:
+            return APIResponseUVIndexPage1()
+        elif pagination_token == 'b2Zmc2V0PTI1':
+            return APIResponseUVIndexPage2()
+        elif pagination_token == 'b2Zmc2V0PTUw':
+            return APIResponseUVIndexPage3()
 
-    assert all(
-        TEST_DATETIME <= period['timePeriod']['end'] \
-            for period in record['periods']
-    )
+    monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 
-def test_four_day_weather_forecast(client):
-    four_day_weather_forecast = client.four_day_weather_forecast()
+    data = client.uv_index()
 
-    assert four_day_weather_forecast is not None
-
-def test_four_day_weather_forecast_with_date(client):
-    four_day_weather_forecast = client.four_day_weather_forecast(
-        date=TEST_DATE,
-    )
-
-    for record in four_day_weather_forecast['records']:
-        assert all(
-            forecast['timestamp'].date() >= TEST_DATE \
-                for forecast in record['forecasts']
-        )
-
-def test_four_day_weather_forecast_with_datetime(client):
-    four_day_weather_forecast = client.four_day_weather_forecast(
-        date=TEST_DATETIME,
-    )
-
-    assert len(four_day_weather_forecast['records']) == 1
-
-    record = four_day_weather_forecast['records'][0]
-
-    assert all(
-        forecast['timestamp'] >= TEST_DATETIME \
-            for forecast in record['forecasts']
-    )
+    assert len(data['records']) == 13

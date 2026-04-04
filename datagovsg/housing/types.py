@@ -1,4 +1,4 @@
-# Copyright 2025 Yuhui. All rights reserved.
+# Copyright 2025-2026 Yuhui. All rights reserved.
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,10 +15,7 @@
 """Data.gov.sg custom types for Housing client methods' responses."""
 
 from datetime import datetime
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import TypedDict
 
 # Carpark Availability
 
@@ -58,7 +55,7 @@ class _CarparkAvailabilityItemDataDict(TypedDict):
         tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
     """
 
-class _CarparkAvailabilityItemDict(TypedDict):
+class CarparkAvailabilityItemDict(TypedDict):
     """Type definition for CarparkAvailabilityDict"""
 
     timestamp: datetime
@@ -70,12 +67,6 @@ class _CarparkAvailabilityItemDict(TypedDict):
     carpark_data: list[_CarparkAvailabilityItemDataDict]
     """Carpark availability information per carpark."""
 
-class CarparkAvailabilityDict(TypedDict):
-    """Type definition for carpark_availability()"""
-
-    items: list[_CarparkAvailabilityItemDict]
-    """Items."""
-
 __all__ = [
-    'CarparkAvailabilityDict',
+    'CarparkAvailabilityItemDict',
 ]

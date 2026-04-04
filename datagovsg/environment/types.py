@@ -1,4 +1,4 @@
-# Copyright 2025 Yuhui. All rights reserved.
+# Copyright 2025-2026 Yuhui. All rights reserved.
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +14,12 @@
 
 """Data.gov.sg custom types for Environment client methods' responses."""
 
-from datetime import date, datetime
-from typing import NotRequired
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from datetime import date, datetime as datetimedatetime
+from typing import NotRequired, TypedDict
 
 # Common types
 
-class _LabelLocationDict(TypedDict):
+class _LocationDict(TypedDict):
     """Type definition for various custom types"""
 
     latitude: float
@@ -45,7 +41,7 @@ class _AreaMetadataDict(TypedDict):
 
     :example: "Ang Mo Kio"
     """
-    label_location: _LabelLocationDict
+    label_location: _LocationDict
     """Provides longitude and latitude for placing readings on a map."""
 
 class _RegionMetadataDict(TypedDict):
@@ -56,7 +52,7 @@ class _RegionMetadataDict(TypedDict):
 
     :example: "West"
     """
-    labelLocation: _LabelLocationDict
+    labelLocation: _LocationDict
     """Provides longitude and latitude for placing readings on a map."""
 
 class _RegionReadingsDict(TypedDict):
@@ -111,7 +107,7 @@ class _StationDict(TypedDict):
 
     :example: "Marina Gardens Drive"
     """
-    labelLocation: _LabelLocationDict
+    labelLocation: _LocationDict
     """Provides longitude and latitude for placing readings on a map."""
 
 class _StationReadingDataDict(TypedDict):
@@ -131,7 +127,7 @@ class _StationReadingDataDict(TypedDict):
 class _StationReadingDict(TypedDict):
     """Type definition for various custom types"""
 
-    timestamp: datetime
+    timestamp: datetimedatetime
     """Timestamp.
 
     :example: datetime(2025, 1, 12, 15, 59, 0, \
@@ -154,31 +150,21 @@ class _WeatherForecastLowHighDict(TypedDict):
     :example: 30
     """
 
-class _WeatherForecastLowHighUnitDict(TypedDict):
+class _WeatherForecastLowHighUnitDict(_WeatherForecastLowHighDict):
     """Type definition for various custom types"""
 
-    low: int | float
-    """Low value.
-
-    :example: 26
-    """
-    high: int | float
-    """High value.
-
-    :example: 36
-    """
     unit: str
     """Unit of measure."""
 
 class _WeatherForecastValidPeriodDict(TypedDict):
     """Type definition for various custom types"""
 
-    start: datetime
+    start: datetimedatetime
     """Valid period start time.
 
     :example: datetime(2025, 1, 12, 16, 30, 0)
     """
-    end: datetime
+    end: datetimedatetime
     """Valid period end time.
 
     :example: datetime(2025, 1, 12, 18, 30, 0)
@@ -219,7 +205,7 @@ class _WindSpeedStationDict(TypedDict):
 
     :example: "Marina Gardens Drive"
     """
-    location: _LabelLocationDict
+    location: _LocationDict
     """Label location."""
 
 class EnvironmentReadingDict(TypedDict):
@@ -249,6 +235,296 @@ class EnvironmentReadingDict(TypedDict):
     :example: Wind Speed: "knots"
     """
 
+# Flood Alert, Lightning, WBGT
+
+class _FloodAlertRecordItemReadingAreaDict(TypedDict):
+    """Type definition for _FloodAlertRecordItemReadingDict"""
+
+    areaDesc: str
+    """Area description.
+
+    :example: "at <street name1> from <street name2> to <street name3>"
+    """
+    circle: list[float]
+    """Lat/Lng and radius in kilometers. The radius refers to the \
+        broadcasting radius of the specific alert, it is NOT indicative of the \
+        extent of the flooding.
+
+    :example: [1.33201, 103.87015, 1]
+    """
+
+class _FloodAlertRecordItemReadingEventcodeDict(TypedDict):
+    """Type definition for _FloodAlertRecordItemReadingDict"""
+
+    value: str
+    """Event code. A system-specific code identifying the event type of the \
+        alert message. Default Event Code: "OET-081" - flood.
+
+    :example: "OET-081"
+    """
+    valueName: str
+    """Event code name. valueName will always be "OET:v1.2".
+
+    :example: "OET:v1.2"
+    """
+
+class _FloodAlertRecordItemReadingDict(TypedDict):
+    """Type definition for _WeatherRecordFloodAlertItemDict"""
+
+    area: _FloodAlertRecordItemReadingAreaDict
+    """Area."""
+    category: str
+    """Observation category. Code denoting the category of the subject event \
+        of the alert message. Default Code Values: "Met" - Meteorological \
+        (inc flood).
+
+    :example: "Met"
+    """
+    certainty: str
+    """Observation certainty. Code denoting the certainty of the subject \
+        event of the alert message. Code Values:
+
+    - "Observed" - Determined to have occurred or to be ongoing.
+
+    :example: "Observed"
+    """
+    description: str
+    """Location of Flood. Text describing the subject event of the alert \
+        message.
+
+    :example: "Flash flood at Bt Timah Rd from Wilby Rd to Blackmore Dr. \
+        Please avoid the area. Issued 1705 hrs."
+    """
+    event: str
+    """Text denoting the type of the subject event of the alert message. \
+        Event will always be "Flood".
+
+    :example: "Flood"
+    """
+    eventCode: _FloodAlertRecordItemReadingEventcodeDict
+    """Event code."""
+    headline: str
+    """Text headline of the alert message.
+
+    :example: "Flash Flood Alert"
+    """
+    instruction: str
+    """Text describing the recommended action to be taken by recipients of \
+        the alert message.
+
+    :example: "Please avoid this area for the next one (1) hour."
+    """
+    responseType: str
+    """Alert response type. Code denoting the type of action recommended for \
+        the target audience. Default Code Value: "Avoid".
+
+    :example: "Avoid"
+    """
+    senderName: str
+    """Text naming the originator of the alert message. senderName will \
+        always be "PUB".
+
+    :example: "PUB"
+    """
+    severity: str
+    """Code denoting the severity of the subject event of the alert message. \
+        Possible Code Values:
+
+    - "Extreme" - Extraordinary threat to life or property.
+    - "Severe" - Significant threat to life or property.
+    - "Moderate" - Possible threat to life or property
+    - "Minor" – Minimal to no known threat to life or property.
+
+    :example: "Minor"
+    """
+    urgency: str
+    """Code denoting the severity of the subject event of the alert message. \
+        Default Code Value: "Immediate" - Responsive action SHOULD be taken \
+        immediately.
+
+    :example: "Immediate"
+    """
+
+class _LightningRecordItemReadingDict(TypedDict):
+    """Type definition for _WeatherRecordItemDict"""
+
+    location: _LocationDict
+    """Location."""
+    datetime: datetimedatetime
+    """The date and time when the weather reading was taken.
+
+    :example: datetime(2025, 2, 7, 19, 16, 44)
+    """
+    text: str
+    """A textual description of the weather event, which can include types \
+        such as "Cloud to Cloud" or "Cloud to Ground."
+
+    :example: "Cloud to Cloud"
+    """
+    type: str
+    """The type of lightning event, which can be either "C" for Cloud to \
+        Cloud or "G" for Cloud to Ground.
+
+    :example: "C"
+    """
+
+class _WBGTRecordItemReadingStationDict(TypedDict):
+    """Type definition for _WBGTRecordItemReadingDict"""
+
+    name: str
+    """Station name. One of:
+
+    - "Bukit Timah (West)"
+    - "Tuas Terminal Gateway"
+    - "Choa Chu Kang Stadium"
+    - "Yio Chu Kang Stadium"
+    - "Sentosa Palawan Green"
+    - "Punggol North"
+    - "Upper Changi Road North"
+    - "Woodlands Street 13"
+    - "Old Chua Chu Kang Road"
+    - "Stadium Road"
+    - "Bishan Street"
+    - "Bedok North Street 2"
+    - "West Coast Road"
+    - "Jurong West Street 93"
+    - "Sakra Road"
+
+    :example: "Upper Changi Road North"
+    """
+    id: str
+    """Station ID. One of:
+
+    - "S187"
+    - "S139"
+    - "S140"
+    - "S141"
+    - "S142"
+    - "S143"
+    - "S124"
+    - "S125"
+    - "S126"
+    - "S127"
+    - "S128"
+    - "S129"
+    - "S130"
+    - "S132"
+    - "S137"
+
+    :example: "S124"
+    """
+    townCenter: str
+    """Town centre.
+
+    :example: "Changi"
+    """
+
+class _WBGTRecordItemReadingDict(TypedDict):
+    """Type definition for _WeatherRecordItemDict"""
+
+    station: _WBGTRecordItemReadingStationDict
+    """Station."""
+    heatStress: str
+    """A string indicating the level of heat stress at the location.
+
+    :example: "Low"
+    """
+    location: _LocationDict
+    """Location."""
+    wbgt: float
+    """Wet Bulb Globe Temperature value at the station.
+
+    :example: 26.9
+    """
+
+class _WeatherRecordItemDict(TypedDict):
+    """Type definition for _WeatherRecordDict"""
+
+    type: str
+    """Type of the weather information (`observation` or `forecast`). \
+        Lightning and WGBT is always `observation.`.
+
+    :example: "observation"
+    """
+    isStationData: bool
+    """Indicates whether the weather information includes station information.
+
+    :example: False
+    """
+    readings: list[
+        _FloodAlertRecordItemReadingDict \
+        | _LightningRecordItemReadingDict \
+        | _WBGTRecordItemReadingDict
+    ]
+    """List of flood alert, lightning or WBGT record item readings."""
+
+class _WeatherRecordFloodAlertItemDict(_WeatherRecordItemDict):
+    """Type definition for _WeatherRecordDict"""
+
+    identifier: NotRequired[str]
+    """A number or string uniquely identifying this observation, assigned by \
+        the sender.
+
+    :example: "2.49.0.0.702.2-BCM-17586121561884-DYOONG"
+    """
+    msgType: NotRequired[str]
+    """Code denoting the nature of the alert message. Possible Code Values:
+
+    - "Alert" - Initial information requiring attention by targeted recipients.
+    - "Cancel" - Cancels the earlier message(s) identified in 'references'.
+
+    :example: "Alert"
+    """
+    references: NotRequired[str]
+    """The group listing identifying earlier message(s) referenced by the \
+        alert message. The string will be in the form of \
+        sender,identifier,sentTime.
+
+    :example: "pub_joint_ops_ctr@pub.gov.sg, 2.49.0.0.702.2-BCM-17586117885024-DYOONG, 2025-09-23T15:16:28+08:00"
+    """
+    sender: NotRequired[str]
+    """Identifier of the sender of the alert message.
+
+    :example: "pub_joint_ops_ctr@pub.gov.sg"
+    """
+    scope: NotRequired[str]
+    """Code denoting the intended distribution of the alert message. Default \
+        Code Value: "Public" - For general dissemination to unrestricted \
+        audiences.
+
+    :example: "Public"
+    """
+    status: NotRequired[str]
+    """Code denoting the appropriate handling of the alert message. Default \
+        Code Value: "Actual" - Actionable by all targeted recipients.
+
+    :example: "Public"
+    """
+
+class _WeatherRecordDict(TypedDict):
+    """Type definition for WeatherDict"""
+
+    datetime: datetimedatetime
+    """Date and Time the flood observation was issued by PUB.
+
+    :example: date(2024, 7, 17, 14, 15, 43, \
+        tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
+    """
+    updatedTimestamp: datetimedatetime
+    """SGT timestamp of last updated.
+
+    :example: datetime(2024, 7, 17, 14, 15, 43, \
+        tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
+    """
+    item: _WeatherRecordFloodAlertItemDict | _WeatherRecordItemDict
+    """Flood alert or weather record item."""
+
+class WeatherDict(TypedDict):
+    """Type definition for flood_alerts(), lightning(), wbgt()"""
+
+    records: list[_WeatherRecordDict]
+    """Records."""
+
 # PM2.5
 
 class _PM25ItemReadingsDict(TypedDict):
@@ -265,13 +541,13 @@ class _PM25ItemDict(TypedDict):
 
     :example: date(2024, 7, 17)
     """
-    updatedTimestamp: datetime
+    updatedTimestamp: datetimedatetime
     """SGT timestamp of last updated.
 
     :example: datetime(2024, 7, 17, 14, 15, 43, \
         tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
     """
-    timestamp: datetime
+    timestamp: datetimedatetime
     """SGT timestamp of the reading.
 
     :example: datetime(2024, 7, 17, 6, 0, 0, \
@@ -356,13 +632,13 @@ class _PSIItemDict(TypedDict):
 
     :example: date(2024, 7, 17)
     """
-    updatedTimestamp: datetime
+    updatedTimestamp: datetimedatetime
     """SGT timestamp of last updated.
 
     :example: datetime(2024, 7, 17, 14, 15, 43, \
         tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
     """
-    timestamp: datetime
+    timestamp: datetimedatetime
     """SGT timestamp of the reading.
 
     :example: datetime(2024, 7, 17, 6, 0, 0, \
@@ -386,7 +662,7 @@ class PSIDict(TypedDict):
 class _UVIndexRecordHourlyIndexDict(TypedDict):
     """Type definition for _UVIndexRecordDict"""
 
-    hour: datetime
+    hour: datetimedatetime
     """"Hour indicating the start of the hour for which the index is for.
 
     :example: datetime(2024, 7, 17, 11, 0, 0, \
@@ -406,13 +682,13 @@ class _UVIndexRecordDict(TypedDict):
 
     :example: date(2024, 7, 17)
     """
-    updatedTimestamp: datetime
+    updatedTimestamp: datetimedatetime
     """SGT timestamp of last updated.
 
     :example: datetime(2024, 7, 17, 14, 15, 43, \
         tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
     """
-    timestamp: datetime
+    timestamp: datetimedatetime
     """SGT timestamp of the reading.
 
     :example: datetime(2024, 7, 17, 6, 0, 0, \
@@ -468,13 +744,13 @@ class _WeatherForecastTwoHourItemForecastDict(TypedDict):
 class _WeatherForecastTwoHourItemDict(TypedDict):
     """Type definition for WeatherForecastTwoHourDict"""
 
-    update_timestamp: datetime
+    update_timestamp: datetimedatetime
     """Time of acquisition of data from NEA.
 
     :example: datetime(2024, 7, 17, 5, 5, 54, \
         tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
     """
-    timestamp: datetime
+    timestamp: datetimedatetime
     """Time that forecast was issued by NEA.
 
     :example: datetime(2024, 7, 17, 4, 59, 0, \
@@ -577,13 +853,13 @@ class _WeatherForecastTwentyFourHourRecordDict(TypedDict):
 
     :example: date(2024, 7, 17)
     """
-    updatedTimestamp: datetime
+    updatedTimestamp: datetimedatetime
     """Time of acquisition of data from NEA.
 
     :example: datetime(2024, 7, 17, 5, 5, 54, \
         tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
     """
-    timestamp: datetime
+    timestamp: datetimedatetime
     """Time that forecast was issued by NEA.
 
     :example: datetime(2024, 7, 17, 4, 59, 0, \
@@ -648,7 +924,7 @@ class _WeatherForecastFourDayRecordForecastForecastDict(TypedDict):
 class _WeatherForecastFourDayRecordForecastDict(TypedDict):
     """Type definition for _WeatherForecastFourDayRecordDict"""
 
-    timestamp: datetime
+    timestamp: datetimedatetime
     """Time that forecast was issued by NEA.
 
     :example: datetime(2024, 7, 17, 16, 0, 0, \
@@ -682,13 +958,13 @@ class _WeatherForecastFourDayRecordDict(TypedDict):
 
     :example: date(2024, 7, 17)
     """
-    updatedTimestamp: datetime
+    updatedTimestamp: datetimedatetime
     """Time of acquisition of data from NEA.
 
     :example: datetime(2024, 7, 17, 5, 5, 54, \
         tzinfo=zoneinfo.ZoneInfo(key='Asia/Singapore'))
     """
-    timestamp: datetime
+    timestamp: datetimedatetime
     """Time that forecast was issued by NEA.
 
     :example: datetime(2024, 7, 17, 4, 59, 0, \
@@ -708,6 +984,7 @@ __all__ = [
     'PM25Dict',
     'PSIDict',
     'UVIndexDict',
+    'WeatherDict',
     'WeatherForecastTwoHourDict',
     'WeatherForecastTwentyFourHourDict',
     'WeatherForecastFourDayDict',

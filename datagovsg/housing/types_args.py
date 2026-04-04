@@ -1,4 +1,4 @@
-# Copyright 2025 Yuhui. All rights reserved.
+# Copyright 2025-2026 Yuhui. All rights reserved.
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,7 @@
 """Data.gov.sg custom types for Housing client methods' arguments."""
 
 from datetime import datetime
-from typing import NotRequired
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import NotRequired, TypedDict
 
 class HousingArgsDict(TypedDict):
     """Type definition for carpark_availability() input arguments"""

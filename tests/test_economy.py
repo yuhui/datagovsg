@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,38 +16,45 @@
 
 """Test that the Economy class is working properly."""
 
-from datetime import date
+from os import getenv
 
 import pytest
+from dotenv import load_dotenv
+from typeguard import check_type
 
 from datagovsg import Economy
+from datagovsg.economy.types import (
+    DesignsDict,
+    PatentsDict,
+    TrademarksDict,
+)
 
-METHODS = [
-    'designs',
-    'patents',
-    'trademarks',
+TEST_PARAMETERS = [
+    ('designs', DesignsDict),
+    ('patents', PatentsDict),
+    ('trademarks', TrademarksDict),
 ]
 
+"""
+The API endpoint is poorly documented, so skip the tests for specific dates.
+Anyway, it seems that the endpoint always returns 0 results, so maybe it's not
+working properly in the first place. __shrug shoulders__
+
+from datetime import date
 LODGEMENT_DATE = date(2025, 1, 12)
+"""
 
 @pytest.fixture(scope='module')
 def client():
-    return Economy()
+    load_dotenv()
+    api_key = getenv('DATAGOVSG_API_KEY')
+    return Economy(api_key)
 
 @pytest.mark.parametrize(
-    ('method'),
-    METHODS,
+    ('method', 'expected_type'),
+    TEST_PARAMETERS,
 )
-def test_economy_method(client, method):
+def test_economy_methods(client, method, expected_type):
     data = getattr(client, method, None)()
 
-    assert data is not None
-
-@pytest.mark.parametrize(
-    ('method'),
-    METHODS,
-)
-def test_economy_method_with_lodgement_date(client, method):
-    data = getattr(client, method, None)(lodgement_date=LODGEMENT_DATE)
-
-    assert data is not None
+    assert check_type(data, expected_type) == data

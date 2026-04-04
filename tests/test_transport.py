@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,52 +16,95 @@
 
 """Test that the Transport class is working properly."""
 
-from datetime import date, datetime, time, timedelta
+from datetime import datetime
+from os import getenv
+from unittest.mock import Mock
 from zoneinfo import ZoneInfo
 
 import pytest
+from dotenv import load_dotenv
+from requests_cache import CachedSession
+from typeguard import check_type
 
 from datagovsg import Transport
-
-TEST_DATE = date.today() - timedelta(1)
-TEST_DATETIME = datetime.combine(
-    TEST_DATE,
-    time(23, 45, 16, tzinfo=ZoneInfo('Asia/Singapore'))
+from datagovsg.transport.types import (
+    TaxiAvailabilityDict,
+    TrafficImagesItemDict,
 )
+
+from .mocks.api_response_transport import (
+    APIResponseTaxiAvailability,
+    APIResponseTrafficImages,
+)
+
+TEST_DATETIME = datetime(
+    2026, 1, 12, 0, 15, 0,
+    tzinfo=ZoneInfo('Asia/Singapore'),
+)
+TEST_DATETIME_STRING = TEST_DATETIME.strftime('%Y-%m-%dT%H:%M:%S')
+
+TEST_PARAMETERS_AND_MOCKS = [
+    (
+        'taxi_availability',
+        TaxiAvailabilityDict,
+        APIResponseTaxiAvailability,
+    ),
+    (
+        'traffic_images',
+        list[TrafficImagesItemDict],
+        APIResponseTrafficImages,
+    ),
+]
 
 @pytest.fixture
 def client():
-    return Transport()
+    load_dotenv()
+    api_key = getenv('DATAGOVSG_API_KEY')
+    return Transport(api_key)
 
-def test_taxi_availability(client):
-    taxi_availability = client.taxi_availability()
+@pytest.mark.parametrize(
+    (
+        'method',
+        'expected_type',
+        'mocked_response_method',
+    ),
+    TEST_PARAMETERS_AND_MOCKS,
+)
+def test_transport_methods(
+    client,
+    method,
+    expected_type,
+    mocked_response_method,
+):
+    data = getattr(client, method, None)()
 
-    assert taxi_availability is not None
+    assert check_type(data, expected_type) == data
 
-def test_taxi_availability_with_datetime(client):
-    taxi_availability = client.taxi_availability(date_time=TEST_DATETIME)
+@pytest.mark.parametrize(
+    (
+        'method',
+        'expected_type',
+        'mocked_response_method',
+    ),
+    TEST_PARAMETERS_AND_MOCKS,
+)
+def test_transport_methods_with_datetime(
+    client,
+    method,
+    expected_type,
+    mocked_response_method,
+    monkeypatch,
+):
+    def mock_requests_get(*args, **kwargs):
+        return mocked_response_method()
 
-    timestamp = taxi_availability['features'][0]['properties']['timestamp']
-    timestamp_difference = (TEST_DATETIME - timestamp) \
-        if TEST_DATETIME > timestamp \
-        else (timestamp - TEST_DATETIME)
+    monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 
-    # Allow 5-minute difference
-    assert timestamp_difference.seconds <= (60 * 5)
+    original_send_request = client.send_request
+    client.send_request = Mock(side_effect=original_send_request)
 
-def test_traffic_images(client):
-    traffic_images = client.traffic_images()
+    _ = getattr(client, method, None)(date_time=TEST_DATETIME)
 
-    assert traffic_images is not None
-
-def test_traffic_images_with_datetime(client):
-    traffic_images = client.traffic_images(date_time=TEST_DATETIME)
-
-    timestamp = traffic_images['items'][0]['timestamp']
-    timestamp_difference = (TEST_DATETIME - timestamp) \
-        if TEST_DATETIME > timestamp \
-        else (timestamp - TEST_DATETIME)
-
-    # Allow 5-minute difference
-    assert timestamp_difference.seconds <= (60 * 5)
-
+    client.send_request.assert_called_once()
+    _, kwargs = client.send_request.call_args
+    assert kwargs['params']['date_time'] == TEST_DATETIME_STRING

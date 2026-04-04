@@ -6,17 +6,7 @@ datagovsg.housing.types Response Types
 carpark_availability()
 ----------------------
 
-.. autoclass:: CarparkAvailabilityDict
-   :members:
-   :member-order: bysource
-   :show-inheritance:
-
-   .. py:attribute:: items
-      :type: list[_CarparkAvailabilityItemDict]
-
-      Items.
-
-.. autoclass:: _CarparkAvailabilityItemDict
+.. autoclass:: CarparkAvailabilityItemDict
    :members:
    :member-order: bysource
    :show-inheritance:

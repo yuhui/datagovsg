@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,22 @@ UV_INDEX_API_ENDPOINT = f'{BASE_V2_API_ENDPOINT}/uv'
 WIND_DIRECTION_API_ENDPOINT = f'{BASE_V2_API_ENDPOINT}/wind-direction'
 WIND_SPEED_API_ENDPOINT = f'{BASE_V2_API_ENDPOINT}/wind-speed'
 
+WEATHER_API_ENDPOINT = f'{BASE_V2_API_ENDPOINT}/weather'
+FLOOD_ALERTS_API_ENDPOINT = f'{WEATHER_API_ENDPOINT}/flood-alerts'
+
+LIGHTNING_DEFAULT_PARAMS = {
+    'api': 'lightning',
+}
+WBGT_DEFAULT_PARAMS = {
+    'api': 'wbgt',
+}
+
+WIND_SPEED_SANITISE_IGNORE_KEYS = [
+    'stations[].id',
+    'stations[].deviceId',
+    'readings[].data[].stationId',
+]
+
 __all__ = [
     'AIR_TEMPERATURE_API_ENDPOINT',
     'FOUR_DAY_WEATHER_FORECAST_API_ENDPOINT',
@@ -43,4 +59,12 @@ __all__ = [
     'UV_INDEX_API_ENDPOINT',
     'WIND_DIRECTION_API_ENDPOINT',
     'WIND_SPEED_API_ENDPOINT',
+
+    'WEATHER_API_ENDPOINT',
+    'FLOOD_ALERTS_API_ENDPOINT',
+
+    'LIGHTNING_DEFAULT_PARAMS',
+    'WBGT_DEFAULT_PARAMS',
+
+    'WIND_SPEED_SANITISE_IGNORE_KEYS',
 ]

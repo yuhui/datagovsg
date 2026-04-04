@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Test singstat package
+    name: Test datagovsg package
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
@@ -14,6 +14,8 @@ jobs:
     - name: Install requirements
       run: pip install -r requirements_dev.txt
     - name: Run tests and collect coverage
+      env:
+        DATAGOVSG_API_KEY: ${{ secrets.DATAGOVSG_API_KEY }}
       run: pytest --cov=datagovsg --cov-report=xml
     - name: Upload coverage reports to Codecov with GitHub Action
       uses: codecov/codecov-action@v5

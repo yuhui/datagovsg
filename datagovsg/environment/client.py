@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 """Client for interacting with the Environment APIs."""
 
+from time import sleep
 from typing import Any, Unpack
-from urllib.parse import urlencode
 
 from typeguard import typechecked
 
@@ -27,7 +27,6 @@ from ..constants import (
     CACHE_TWELVE_HOURS,
 )
 from ..datagovsg import DataGovSg
-from ..exceptions import APIError
 from ..types import Url
 
 from .constants import (
@@ -42,13 +41,22 @@ from .constants import (
     UV_INDEX_API_ENDPOINT,
     WIND_DIRECTION_API_ENDPOINT,
     WIND_SPEED_API_ENDPOINT,
+
+    WEATHER_API_ENDPOINT,
+    FLOOD_ALERTS_API_ENDPOINT,
+
+    LIGHTNING_DEFAULT_PARAMS,
+    WBGT_DEFAULT_PARAMS,
+
+    WIND_SPEED_SANITISE_IGNORE_KEYS,
 )
-from .types_args import EnvironmentArgsDict
+from .types_args import EnvironmentArgsDict, WeatherArgsDict
 from .types import (
     EnvironmentReadingDict,
     PM25Dict,
     PSIDict,
     UVIndexDict,
+    WeatherDict,
     WeatherForecastTwoHourDict,
     WeatherForecastTwentyFourHourDict,
     WeatherForecastFourDayDict,
@@ -79,7 +87,10 @@ class Client(DataGovSg):
         """
         air_temperature: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         air_temperature = self.__collect_environment_data(
             AIR_TEMPERATURE_API_ENDPOINT,
@@ -88,6 +99,66 @@ class Client(DataGovSg):
         )
 
         return air_temperature
+
+    @typechecked
+    def flood_alerts(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict]
+    ) -> WeatherDict:
+        """Get flood alert information across Singapore.
+
+        Update frequency is not specified, so defaults to half hourly.
+
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
+
+        :return: Flood alert Information. (Cached for 30 minutse.)
+        :rtype: WeatherDict
+        """
+        flood_alerts: WeatherDict
+
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
+
+        flood_alerts = self.__collect_environment_data(
+            FLOOD_ALERTS_API_ENDPOINT,
+            params=params,
+            cache_duration=CACHE_THIRTY_MINUTES,
+        )
+
+        return flood_alerts
+
+    @typechecked
+    def lightning(self, **kwargs: Unpack[WeatherArgsDict]) -> WeatherDict:
+        """Retrieve the latest lightning observation.
+
+        Update frequency is not specified, so defaults to half hourly.
+
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: WeatherArgsDict
+
+        :return: Lightning Information. (Cached for 30 minutse.)
+        :rtype: WeatherDict
+        """
+        lightning: WeatherDict
+
+        params = self.build_params(
+            params_expected_type=WeatherArgsDict,
+            original_params=kwargs,
+            default_params=LIGHTNING_DEFAULT_PARAMS,
+        )
+
+        lightning = self.__collect_environment_data(
+            WEATHER_API_ENDPOINT,
+            params=params,
+            cache_duration=CACHE_THIRTY_MINUTES,
+        )
+
+        return lightning
 
     @typechecked
     def pm25(self, **kwargs: Unpack[EnvironmentArgsDict]) -> PM25Dict:
@@ -104,7 +175,10 @@ class Client(DataGovSg):
         """
         pm25: PM25Dict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         pm25 = self.__collect_environment_data(
             PM25_API_ENDPOINT,
@@ -129,7 +203,10 @@ class Client(DataGovSg):
         """
         psi: PSIDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         psi = self.__collect_environment_data(
             PSI_API_ENDPOINT,
@@ -157,7 +234,10 @@ class Client(DataGovSg):
         """
         rainfall: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         rainfall = self.__collect_environment_data(
             RAINFALL_API_ENDPOINT,
@@ -185,7 +265,10 @@ class Client(DataGovSg):
         """
         relative_humidity: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         relative_humidity = self.__collect_environment_data(
             RELATIVE_HUMIDITY_API_ENDPOINT,
@@ -211,7 +294,10 @@ class Client(DataGovSg):
         """
         uv_index: UVIndexDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         uv_index = self.__collect_environment_data(
             UV_INDEX_API_ENDPOINT,
@@ -220,6 +306,36 @@ class Client(DataGovSg):
         )
 
         return uv_index
+
+    @typechecked
+    def wbgt(self, **kwargs: Unpack[WeatherArgsDict]) -> WeatherDict:
+        """Retrieve the latest WBGT data for accurate heat stress assessment.
+
+        Update frequency is not specified, so defaults to half hourly.
+
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: WeatherArgsDict
+
+        :return: Wet Bulb Globe Temperature Information. (Cached for 30 \
+            minutse.)
+        :rtype: WeatherDict
+        """
+        wbgt: WeatherDict
+
+        params = self.build_params(
+            params_expected_type=WeatherArgsDict,
+            original_params=kwargs,
+            default_params=WBGT_DEFAULT_PARAMS,
+        )
+
+        wbgt = self.__collect_environment_data(
+            WEATHER_API_ENDPOINT,
+            params=params,
+            cache_duration=CACHE_THIRTY_MINUTES,
+        )
+
+        return wbgt
 
     @typechecked
     def two_hour_weather_forecast(
@@ -239,7 +355,10 @@ class Client(DataGovSg):
         """
         two_hour_weather_forecast: WeatherForecastTwoHourDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         two_hour_weather_forecast = self.__collect_environment_data(
             TWO_HOUR_WEATHER_FORECAST_API_ENDPOINT,
@@ -267,7 +386,10 @@ class Client(DataGovSg):
         """
         twenty_four_hour_weather_forecast: WeatherForecastTwentyFourHourDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         twenty_four_hour_weather_forecast = self.__collect_environment_data(
             TWENTY_FOUR_HOUR_WEATHER_FORECAST_API_ENDPOINT,
@@ -295,7 +417,10 @@ class Client(DataGovSg):
         """
         four_day_weather_forecast: WeatherForecastFourDayDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         four_day_weather_forecast = self.__collect_environment_data(
             FOUR_DAY_WEATHER_FORECAST_API_ENDPOINT,
@@ -323,7 +448,10 @@ class Client(DataGovSg):
         """
         wind_direction: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
         wind_direction = self.__collect_environment_data(
             WIND_DIRECTION_API_ENDPOINT,
@@ -351,12 +479,21 @@ class Client(DataGovSg):
         """
         wind_speed: EnvironmentReadingDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
 
-        wind_speed = self.__collect_environment_data(
+        data = self.__collect_environment_data(
             WIND_SPEED_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_MINUTE,
+            sanitise=False,
+        )
+
+        wind_speed = self.sanitise_data(
+            data,
+            ignore_keys=WIND_SPEED_SANITISE_IGNORE_KEYS,
         )
 
         return wind_speed
@@ -368,11 +505,12 @@ class Client(DataGovSg):
         url: Url,
         params: dict,
         cache_duration: int,
+        sanitise=True,
     ) -> Any:
         """Get environment data from the specified endpoint URL.
 
-        If there are pages of 'readings' data, then compiles all of those \
-            pages into one big list.
+        If there are pages of data, then compile all of those pages into one \
+            big list.
 
         (Since this method has to call `send_request()`, so the parameters \
             are similar to that method's.)
@@ -386,33 +524,36 @@ class Client(DataGovSg):
         :param cache_duration: Number of seconds before the cache expires.
         :type cache_duration: int
 
+        :param sanitise: If true, then the response's values are sanitised \
+            using the ``sanitise_data()`` method. Defaults to True.
+        :type iterate: bool
+
         :return: data from the endpoint, compiling all pages of readings.
         :rtype: Any (but really a dict)
         """
-        params_str = urlencode(params, safe=':+')
         response = self.send_request(
             url,
-            params=params_str,
+            params=params,
             cache_duration=cache_duration,
+            sanitise=sanitise,
         )
 
-        if 'data' not in response:
-            error_message = 'Unexpected error occurred'
-            if 'errorMsg' in response:
-                error_message = response['errorMsg']
-            raise APIError(error_message, response)
-
-        data = response['data']
+        data = response.get('data', {})
 
         if 'paginationToken' in data:
             pagination_token = data.pop('paginationToken')
 
             # Collect the next page of data and append it to this one
             params['paginationToken'] = pagination_token
+
+            # Sleep for a bit to avoid hitting the rate limit
+            sleep(0.5)
+
             response_data = self.__collect_environment_data(
                 url,
                 params=params,
                 cache_duration=cache_duration,
+                sanitise=sanitise,
             )
 
             data_items_name = ''
@@ -427,24 +568,16 @@ class Client(DataGovSg):
 
             # Merge and keep unique values
             data_centre_name = ''
-            data_centre_field = ''
             if 'area_metadata' in data and 'area_metadata' in response_data:
                 data_centre_name = 'area_metadata'
-                data_centre_field = 'name'
             elif 'regionMetadata' in data and 'regionMetadata' in response_data:
                 data_centre_name = 'regionMetadata'
-                data_centre_field = 'name'
             elif 'stations' in data and 'stations' in response_data:
                 data_centre_name = 'stations'
-                data_centre_field = 'id'
-            if data_centre_name != '' and data_centre_field != '':
-                centres = [
-                    centre[data_centre_field] \
-                        for centre in data[data_centre_name]
-                ]
-                for centre in response_data[data_centre_name]:
-                    if centre[data_centre_field] not in centres:
-                        data[data_centre_name].append(centre)
+            if data_centre_name != '':
+                for data_centre in response_data[data_centre_name]:
+                    if data_centre not in data[data_centre_name]:
+                        data[data_centre_name].append(data_centre)
 
         return data
 

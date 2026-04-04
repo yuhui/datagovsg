@@ -1,6 +1,25 @@
 Changelog
 =========
 
+[2.1.0] - 2026-04-05
+--------------------
+
+Added
+^^^^^
+
+- New Environment methods: ``flood_alerts()``, ``lightning()`` and ``wbgt()``.
+- Support use of Data.gov.sg API key with all clients.
+
+Changed
+^^^^^^^
+
+- **Breaking:** Remove ``Ckan`` client.
+- Specify allowed date and datetime string formats.
+- Set datetime correctly in Singapore timezone.
+- Require expected parameter type when building query parameters.
+- Improve data sanitisation. Allow specifying of keys to ignore when sanitising.
+- Refactor some constants.
+
 [2.0.0] - 2025-01-31
 --------------------
 
@@ -24,7 +43,7 @@ Changed
 Deprecated
 ^^^^^^^^^^
 
-- ``Ckan`` client has bee deprecated since Data.gov.sg has removed it.
+- ``Ckan`` client has been deprecated since Data.gov.sg has removed it.
     - Using any method logs a ``DeprecationWarning`` warning.
     - This client will be removed in the next major release of this package or at the end of 2025, whichever is earlier.
 
@@ -34,7 +53,7 @@ Deprecated
 Changed
 ^^^^^^^
 
-- Updated ``pytest`` requirement.
+- Update ``pytest`` requirement.
 
 [1.0.2] - 2019-09-03
 --------------------

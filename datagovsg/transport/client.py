@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,11 +24,13 @@ from ..datagovsg import DataGovSg
 from .constants import (
     TAXI_AVAILABILITY_API_ENDPOINT,
     TRAFFIC_IMAGES_API_ENDPOINT,
+
+    TRAFFIC_IMAGES_SANITISE_IGNORE_KEYS,
 )
 from .types_args import TransportArgsDict
 from .types import (
     TaxiAvailabilityDict,
-    TrafficImagesDict,
+    TrafficImagesItemDict,
 )
 
 class Client(DataGovSg):
@@ -56,7 +58,10 @@ class Client(DataGovSg):
         """
         taxi_availability: TaxiAvailabilityDict
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=TransportArgsDict,
+            original_params=kwargs,
+        )
 
         taxi_availability = self.send_request(
             TAXI_AVAILABILITY_API_ENDPOINT,
@@ -70,7 +75,7 @@ class Client(DataGovSg):
     def traffic_images(
         self,
         **kwargs: Unpack[TransportArgsDict],
-    ) -> TrafficImagesDict:
+    ) -> list[TrafficImagesItemDict]:
         """Get the latest images from traffic cameras all around Singapore.
 
         Retrieved every 20 seconds from LTA's Datamall. But it is recommended \
@@ -81,16 +86,27 @@ class Client(DataGovSg):
         :type kwargs: TransportArgsDict
 
         :return: Images from traffic cameras. (Cached for 1 minute.)
-        :rtype: TrafficImagesDict
+        :rtype: list[TrafficImagesItemDict]
         """
-        traffic_images: TrafficImagesDict
+        traffic_images: list[TrafficImagesItemDict]
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=TransportArgsDict,
+            original_params=kwargs,
+        )
 
-        traffic_images = self.send_request(
+        data = self.send_request(
             TRAFFIC_IMAGES_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_MINUTE,
+            sanitise=False,
+        )
+
+        items = data.get('items', [])
+
+        traffic_images = self.sanitise_data(
+            items,
+            ignore_keys=TRAFFIC_IMAGES_SANITISE_IGNORE_KEYS,
         )
 
         return traffic_images

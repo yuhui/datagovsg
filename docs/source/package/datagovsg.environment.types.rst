@@ -11,7 +11,7 @@ Common Types
    :member-order: bysource
    :show-inheritance:
 
-.. autoclass:: _LabelLocationDict
+.. autoclass:: _LocationDict
    :members:
    :member-order: bysource
    :show-inheritance:
@@ -70,6 +70,68 @@ air_temperature(), rainfall(), relative_humidity(), wind_direction(), wind_speed
    :show-inheritance:
 
 .. autoclass:: _WindSpeedStationDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+flood_alert(), lightning(), wbgt()
+----------------------------------
+
+.. autoclass:: WeatherDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+.. autoclass:: _WeatherRecordDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+.. autoclass:: _WeatherRecordFloodAlertItemDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+.. autoclass:: _WeatherRecordItemDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+flood_alert()
+^^^^^^^^^^^^^
+
+.. autoclass:: _FloodAlertRecordItemReadingDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+.. autoclass:: _FloodAlertRecordItemReadingEventcodeDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+.. autoclass:: _FloodAlertRecordItemReadingAreaDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+lightning()
+^^^^^^^^^^^
+
+.. autoclass:: _LightningRecordItemReadingDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+wbgt()
+^^^^^^
+
+.. autoclass:: _WBGTRecordItemReadingDict
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+.. autoclass:: _WBGTRecordItemReadingStationDict
    :members:
    :member-order: bysource
    :show-inheritance:

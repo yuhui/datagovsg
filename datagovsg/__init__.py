@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,25 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Package init."""
+
 from datetime import datetime
 
-from .ckan import Client as Ckan
 from .economy import Client as Economy
 from .environment import Client as Environment
 from .housing import Client as Housing
 from .transport import Client as Transport
 
-NAME = 'datagovsg'
-VERSION = '2.0.0' # Production
-# VERSION = f'{VERSION}.{datetime.now().strftime("%Y%m%d%H%M")}' # Development
-AUTHOR = 'Yuhui'
-AUTHOR_EMAIL = 'yuhuibc@gmail.com'
+from .author import AUTHOR
+from .version import VERSION
 
 __all__ = [
-    'Ckan',
     'Economy',
     'Environment',
     'Housing',
     'Transport',
 ]
+__author__ = AUTHOR
 __version__ = VERSION

@@ -1,4 +1,4 @@
-# Copyright 2025 Yuhui. All rights reserved.
+# Copyright 2025-2026 Yuhui. All rights reserved.
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,7 @@
 """Data.gov.sg custom types for Transport client methods' responses."""
 
 from datetime import datetime
-from typing import NotRequired
-try:
-    from typing import TypedDict
-except ImportError:
-    TypedDict = dict
+from typing import NotRequired, TypedDict
 
 from ..types import Url
 
@@ -180,8 +176,8 @@ class _TrafficImagesItemCameraDict(TypedDict):
     location: _TrafficImagesItemCameraLocationDict
     """Location."""
 
-class _TrafficImagesItemDict(TypedDict):
-    """Type definition for TrafficImagesDict"""
+class TrafficImagesItemDict(TypedDict):
+    """Type definition for traffic_images()"""
 
     timestamp: datetime
     """Time of acquisition of data.
@@ -192,16 +188,7 @@ class _TrafficImagesItemDict(TypedDict):
     cameras: list[_TrafficImagesItemCameraDict]
     """Camera information and images."""
 
-class TrafficImagesDict(TypedDict):
-    """Type definition for traffic_images()"""
-
-    items: list[_TrafficImagesItemDict]
-    """Items."""
-    api_info: _ApiInfoDict
-    """API info."""
-
-
 __all__ = [
     'TaxiAvailabilityDict',
-    'TrafficImagesDict',
+    'TrafficImagesItemDict',
 ]

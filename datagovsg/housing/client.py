@@ -1,4 +1,4 @@
-# Copyright 2025 Yuhui
+# Copyright 2025-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,13 @@ from typeguard import typechecked
 from ..constants import CACHE_ONE_MINUTE
 from ..datagovsg import DataGovSg
 
-from .constants import CARPARK_AVAILABILITY_API_ENDPOINT
+from .constants import (
+    CARPARK_AVAILABILITY_API_ENDPOINT,
+
+    CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS,
+)
 from .types_args import HousingArgsDict
-from .types import CarparkAvailabilityDict
+from .types import CarparkAvailabilityItemDict
 
 class Client(DataGovSg):
     """Interact with the housing-related endpoints.
@@ -36,7 +40,7 @@ class Client(DataGovSg):
     def carpark_availability(
         self,
         **kwargs: Unpack[HousingArgsDict],
-    ) -> CarparkAvailabilityDict:
+    ) -> list[CarparkAvailabilityItemDict]:
         """Get the latest carpark availability in Singapore.
 
         Retrieved every minute.
@@ -48,15 +52,25 @@ class Client(DataGovSg):
         :return: Available carpark spaces. (Cached for 1 minute.)
         :rtype: CarparkAvailabilityDict
         """
-        carpark_availability: CarparkAvailabilityDict
+        carpark_availability: list[CarparkAvailabilityItemDict]
 
-        params = self.build_params(kwargs)
+        params = self.build_params(
+            params_expected_type=HousingArgsDict,
+            original_params=kwargs,
+        )
 
-        carpark_availability = self.send_request(
+        data = self.send_request(
             CARPARK_AVAILABILITY_API_ENDPOINT,
             params=params,
             cache_duration=CACHE_ONE_MINUTE,
-            sanitise_numbers=True,
+            sanitise=False,
+        )
+
+        items = data.get('items', [])
+
+        carpark_availability = self.sanitise_data(
+            items,
+            ignore_keys=CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS,
         )
 
         return carpark_availability
