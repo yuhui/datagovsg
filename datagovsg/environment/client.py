@@ -42,14 +42,21 @@ from .constants import (
     WIND_DIRECTION_API_ENDPOINT,
     WIND_SPEED_API_ENDPOINT,
 
+    WEATHER_API_ENDPOINT,
+    FLOOD_ALERTS_API_ENDPOINT,
+
+    LIGHTNING_DEFAULT_PARAMS,
+    WBGT_DEFAULT_PARAMS,
+
     WIND_SPEED_SANITISE_IGNORE_KEYS,
 )
-from .types_args import EnvironmentArgsDict
+from .types_args import EnvironmentArgsDict, WeatherArgsDict
 from .types import (
     EnvironmentReadingDict,
     PM25Dict,
     PSIDict,
     UVIndexDict,
+    WeatherDict,
     WeatherForecastTwoHourDict,
     WeatherForecastTwentyFourHourDict,
     WeatherForecastFourDayDict,
@@ -92,6 +99,66 @@ class Client(DataGovSg):
         )
 
         return air_temperature
+
+    @typechecked
+    def flood_alerts(
+        self,
+        **kwargs: Unpack[EnvironmentArgsDict]
+    ) -> WeatherDict:
+        """Get flood alert information across Singapore.
+
+        Update frequency is not specified, so defaults to half hourly.
+
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: EnvironmentArgsDict
+
+        :return: Flood alert Information. (Cached for 30 minutse.)
+        :rtype: WeatherDict
+        """
+        flood_alerts: WeatherDict
+
+        params = self.build_params(
+            params_expected_type=EnvironmentArgsDict,
+            original_params=kwargs,
+        )
+
+        flood_alerts = self.__collect_environment_data(
+            FLOOD_ALERTS_API_ENDPOINT,
+            params=params,
+            cache_duration=CACHE_THIRTY_MINUTES,
+        )
+
+        return flood_alerts
+
+    @typechecked
+    def lightning(self, **kwargs: Unpack[WeatherArgsDict]) -> WeatherDict:
+        """Retrieve the latest lightning observation.
+
+        Update frequency is not specified, so defaults to half hourly.
+
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: WeatherArgsDict
+
+        :return: Lightning Information. (Cached for 30 minutse.)
+        :rtype: WeatherDict
+        """
+        lightning: WeatherDict
+
+        params = self.build_params(
+            params_expected_type=WeatherArgsDict,
+            original_params=kwargs,
+            default_params=LIGHTNING_DEFAULT_PARAMS,
+        )
+
+        lightning = self.__collect_environment_data(
+            WEATHER_API_ENDPOINT,
+            params=params,
+            cache_duration=CACHE_THIRTY_MINUTES,
+        )
+
+        return lightning
 
     @typechecked
     def pm25(self, **kwargs: Unpack[EnvironmentArgsDict]) -> PM25Dict:
@@ -239,6 +306,36 @@ class Client(DataGovSg):
         )
 
         return uv_index
+
+    @typechecked
+    def wbgt(self, **kwargs: Unpack[WeatherArgsDict]) -> WeatherDict:
+        """Retrieve the latest WBGT data for accurate heat stress assessment.
+
+        Update frequency is not specified, so defaults to half hourly.
+
+        :param kwargs: Key-value arguments to be passed as parameters to the \
+            endpoint URL.
+        :type kwargs: WeatherArgsDict
+
+        :return: Wet Bulb Globe Temperature Information. (Cached for 30 \
+            minutse.)
+        :rtype: WeatherDict
+        """
+        wbgt: WeatherDict
+
+        params = self.build_params(
+            params_expected_type=WeatherArgsDict,
+            original_params=kwargs,
+            default_params=WBGT_DEFAULT_PARAMS,
+        )
+
+        wbgt = self.__collect_environment_data(
+            WEATHER_API_ENDPOINT,
+            params=params,
+            cache_duration=CACHE_THIRTY_MINUTES,
+        )
+
+        return wbgt
 
     @typechecked
     def two_hour_weather_forecast(

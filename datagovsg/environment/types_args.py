@@ -30,6 +30,20 @@ class EnvironmentArgsDict(TypedDict):
     :example: datetime(2024, 7, 16, 23, 59, 0)
     """
 
+class WeatherArgsDict(EnvironmentArgsDict):
+    """Type definition for Weather methods' input arguments"""
+
+    api: str
+    """Dataset to query. Must be one of the following:
+
+    - "lightning" - to fetch Lightning records.
+    - "wbgt" - to fetch WBGT records
+
+    IMPORTANT! This is already set when calling the methods, so you do not \
+        need to set this. This is only for type checking purposes.
+    """
+
 __all__ = [
     'EnvironmentArgsDict',
+    'WeatherArgsDict',
 ]
