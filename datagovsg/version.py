@@ -17,7 +17,7 @@
 from datetime import datetime
 
 VERSION = '2.1.0' # Production
-VERSION = f'{VERSION}.dev{datetime.now().strftime("%Y%m%d%H%M")}' # Development
+# VERSION = f'{VERSION}.dev{datetime.now().strftime("%Y%m%d%H%M")}' # Development
 
 __all__ = [
     'VERSION',
