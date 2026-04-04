@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2026 Yuhui. All rights reserved.
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,23 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Package init."""
+"""Package author."""
 
-from datetime import datetime
-
-from .economy import Client as Economy
-from .environment import Client as Environment
-from .housing import Client as Housing
-from .transport import Client as Transport
-
-from .author import AUTHOR
-from .version import VERSION
+AUTHOR = 'Yuhui'
+AUTHOR_EMAIL = 'yuhuibc@gmail.com'
 
 __all__ = [
-    'Economy',
-    'Environment',
-    'Housing',
-    'Transport',
+    'AUTHOR',
+    'AUTHOR_EMAIL',
 ]
-__author__ = AUTHOR
-__version__ = VERSION
