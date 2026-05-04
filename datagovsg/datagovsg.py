@@ -88,14 +88,15 @@ class DataGovSg:
         """String representation"""
         return f'{self.__class__} ({USER_AGENT})'
 
+    @staticmethod
     @typechecked
     def build_params(
-        self,
         params_expected_type: Any,
         original_params: Any,
-        default_params: dict | None=None,
+        default_params: dict[str, Any] | None=None,
         key_map: dict[str, str] | None=None,
-    ) -> dict:
+        remove_none_values: bool=True,
+    ) -> dict[str, Any]:
         """Build the list of parameters that are compatible for use with the \
             endpoint URLs, e.g. camelCase parameter names instead of Python's \
             snake_case, datetime objects to strings.
@@ -111,11 +112,15 @@ class DataGovSg:
         :param default_params: The set of parameters' default values. Should \
             be of the same type as what is specified in \
             ``params_expected_type``. Defaults to None.
-        :type default_params: dict or None
+        :type default_params: dict[str, Any] or None
 
         :param key_map: Mapping of keys used in ``params_expected_types`` to \
             keys expected by the endpoint. Defaults to None.
         :type key_map: dict[str, str] or None
+
+        :param remove_none_values: If True, then parameters with None values \
+            are removed from the returned parameters. Defaults to True.
+        :type remove_none_values: bool
 
         :return: The set of parameters that can be used with the API endpoints.
         :rtype: dict
@@ -126,11 +131,16 @@ class DataGovSg:
             key_map = {}
 
         joined_params = default_params | original_params
+        if remove_none_values:
+            joined_params = {
+                k: v \
+                    for k, v in joined_params.items() if v is not None
+            }
 
         # Ensure that the parameters match the expected input parameter types.
         _ = check_type(joined_params, params_expected_type)
 
-        params: dict = {}
+        params: dict[str, Any] = {}
         for key, value in joined_params.items():
             param_key = key_map[key] if key in key_map else key
 
