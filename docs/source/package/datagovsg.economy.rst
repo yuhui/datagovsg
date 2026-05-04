@@ -7,10 +7,12 @@ Example usage:
 
 .. code-block:: python
 
-    # get the patents lodged today
+    # get the patents lodged on 1 August 2018
+    from datetime import date
     from datagovsg import Economy
+    from datagovsg.economy.types import EconomyDict
     economy = Economy()
-    patents = economy.patents()
+    patents: EconomyDict = economy.patents(lodgement_date=date(2018, 8, 1))
 
 Methods
 -------

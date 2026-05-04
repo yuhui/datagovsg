@@ -25,6 +25,10 @@ from .constants import (
     CARPARK_AVAILABILITY_API_ENDPOINT,
 
     CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS,
+
+    MIN_DATETIME,
+
+    INVALID_DATETIME_ERROR_MESSAGE,
 )
 from .types_args import HousingArgsDict
 from .types import CarparkAvailabilityItemDict
@@ -49,9 +53,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: HousingArgsDict
 
+        :raises ValueError: ``date_time`` argument is before 1 January 2018 \
+            12:00am (inclusive).
+
         :return: Available carpark spaces. (Cached for 1 minute.)
         :rtype: CarparkAvailabilityDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date_time',
+            error_message=INVALID_DATETIME_ERROR_MESSAGE,
+            min_dt=MIN_DATETIME,
+        )
+
         carpark_availability: list[CarparkAvailabilityItemDict]
 
         params = self.build_params(

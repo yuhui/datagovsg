@@ -63,6 +63,9 @@ SANITISE_DATA_DICT = {
         'key1': '316',
         'date_time': '2024-12-01 09:57:45.789',
     },
+    'value_tuple_int': '1,2,3',
+    'value_tuple_float': '1.1,2.2,3.3,4.4',
+    'value_tuple_int_float': '1,2.2,3',
 }
 
 # constants for testing date as date object
@@ -84,13 +87,153 @@ def test_repr(client):
     assert USER_AGENT in repr(client)
 
 @pytest.mark.parametrize(
-    ('original_params', 'default_params', 'key_map', 'expected_params'),
+    ('kwargs', 'min_dt', 'max_dt'),
+    [
+        (
+            {
+                'date': datetime(
+                    2000, 6, 1, 12, 34, 56,
+                    tzinfo=ZoneInfo(key='Asia/Singapore'),
+                ),
+            },
+            datetime(
+                2026, 1, 1, 0, 0, 0,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+            None,
+        ),
+        (
+            {
+                'date': datetime(
+                    2026, 6, 1, 12, 34, 56,
+                    tzinfo=ZoneInfo(key='Asia/Singapore'),
+                ),
+            },
+            datetime(
+                2026, 1, 1, 0, 0, 0,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+            datetime(
+                2026, 3, 31, 23, 59, 59,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+        ),
+        (
+            {
+                'date': date(2026, 6, 1),
+            },
+            datetime(
+                2026, 1, 1, 0, 0, 0,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+            datetime(
+                2026, 3, 31, 23, 59, 59,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+        ),
+    ]
+)
+def test_validate_date_with_error(client, kwargs, min_dt, max_dt):
+    ERROR_MESSAGE = 'Got the error'
+
+    with pytest.raises(ValueError) as excinfo:
+        client.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=ERROR_MESSAGE,
+            min_dt=min_dt,
+            max_dt=max_dt,
+        )
+
+    assert str(excinfo.value) == ERROR_MESSAGE
+
+@pytest.mark.parametrize(
+    ('kwargs', 'min_dt', 'max_dt'),
+    [
+        (
+            {
+                'foo': datetime(
+                    2000, 6, 1, 12, 34, 56,
+                    tzinfo=ZoneInfo(key='Asia/Singapore'),
+                ),
+            },
+            datetime(
+                2026, 1, 1, 0, 0, 0,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+            None,
+        ),
+        (
+            {
+                'date': datetime(
+                    2026, 2, 1, 12, 34, 56,
+                    tzinfo=ZoneInfo(key='Asia/Singapore'),
+                ),
+            },
+            datetime(
+                2026, 1, 1, 0, 0, 0,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+            datetime(
+                2026, 3, 31, 23, 59, 59,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+        ),
+        (
+            {
+                'date': datetime(
+                    2026, 2, 1, 12, 34, 56,
+                    tzinfo=ZoneInfo(key='Asia/Singapore'),
+                ),
+            },
+            datetime(
+                2026, 1, 1, 0, 0, 0,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+            None,
+        ),
+        (
+            {
+                'date': date(2026, 2, 1),
+            },
+            datetime(
+                2026, 1, 1, 0, 0, 0,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+            datetime(
+                2026, 3, 31, 23, 59, 59,
+                tzinfo=ZoneInfo(key='Asia/Singapore'),
+            ),
+        ),
+    ]
+)
+def test_validate_date_without_error(client, kwargs, min_dt, max_dt):
+    try:
+        client.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message='should not have an error',
+            min_dt=min_dt,
+            max_dt=max_dt,
+        )
+    except ValueError as excinfo:
+        pytest.fail(f'Unexpected ValueError raised: {excinfo}')
+
+@pytest.mark.parametrize(
+    (
+        'original_params',
+        'default_params',
+        'key_map',
+        'remove_none_values',
+        'expected_params',
+    ),
     [
         (
             {
                 'foobar': 'foo bar',
                 'date': GOOD_DATE,
                 'datetime': GOOD_DATETIME,
+                'none_value': None,
             },
             {
                 'foobar': 'foo and bar',
@@ -100,6 +243,7 @@ def test_repr(client):
                 'datetime': 'DATE_TIME',
                 'meaning_of_universe': 'meaningOfUniverse',
             },
+            True,
             {
                 'foobar': 'foo bar',
                 'date': GOOD_DATE_STR,
@@ -112,13 +256,16 @@ def test_repr(client):
                 'foobar': 'foo bar',
                 'date': GOOD_DATE,
                 'datetime': GOOD_DATETIME,
+                'none_value': None,
             },
             None,
             None,
+            False,
             {
                 'foobar': 'foo bar',
                 'date': GOOD_DATE_STR,
                 'datetime': GOOD_DATETIME_STR,
+                'none_value': None,
             },
         ),
     ],
@@ -128,9 +275,16 @@ def test_build_params(
     original_params,
     default_params,
     key_map,
+    remove_none_values,
     expected_params,
 ):
-    params = client.build_params(MockArgsDict, original_params, default_params, key_map)
+    params = client.build_params(
+        MockArgsDict,
+        original_params,
+        default_params,
+        key_map,
+        remove_none_values,
+    )
     assert params == expected_params
 
 @pytest.mark.parametrize(
@@ -143,8 +297,8 @@ def test_build_params(
                 'value_ignore': 37,
                 'value_int': 42,
                 'value_bool': True,
-                'value_date': '1/7/2019',
-                'value_blank': None,
+                'value_date': date(2019, 7, 1),
+                'value_blank': '',
                 'value_list': [1, 2, {
                     'key1': 205,
                     'date_time': datetime(2024, 12, 1, 9, 57, 45, tzinfo=ZoneInfo(key='Asia/Singapore')),
@@ -153,6 +307,9 @@ def test_build_params(
                     'key1': 316,
                     'date_time': datetime(2024, 12, 1, 9, 57, 45, 789000, tzinfo=ZoneInfo(key='Asia/Singapore')),
                 },
+                'value_tuple_int': (1, 2, 3),
+                'value_tuple_float': (1.1, 2.2, 3.3, 4.4),
+                'value_tuple_int_float': '1,2.2,3',
             },
         ),
         (
@@ -172,8 +329,8 @@ def test_build_params(
                 'value_ignore': '37',
                 'value_int': 42,
                 'value_bool': True,
-                'value_date': '1/7/2019',
-                'value_blank': None,
+                'value_date': date(2019, 7, 1),
+                'value_blank': '',
                 'value_list': [1, 2, {
                     'key1': '205',
                     'date_time': datetime(2024, 12, 1, 9, 57, 45, tzinfo=ZoneInfo(key='Asia/Singapore')),
@@ -182,6 +339,9 @@ def test_build_params(
                     'key1': 316,
                     'date_time': '2024-12-01 09:57:45.789',
                 },
+                'value_tuple_int': (1, 2, 3),
+                'value_tuple_float': (1.1, 2.2, 3.3, 4.4),
+                'value_tuple_int_float': '1,2.2,3',
             },
         ),
     ],
@@ -197,10 +357,6 @@ def test_sanitise_data(
 @pytest.mark.parametrize(
     ('url', 'params'),
     [
-        (
-            'https://api-open.data.gov.sg/v2/real-time/api/psi',
-            {},
-        ),
         (
             'https://api-open.data.gov.sg/v2/real-time/api/psi?date=2024-07-13T08:13:27',
             {},

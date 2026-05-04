@@ -20,11 +20,16 @@ from typing import Any
 from requests import codes as requests_codes
 from requests.adapters import HTTPAdapter, Retry
 from requests_cache import BaseCache, CachedSession
-from typeguard import check_type, typechecked
+from typeguard import check_type, typechecked, TypeCheckError
 
 from .constants import CACHE_NAME, USER_AGENT
 from .exceptions import APIError
-from .timezone import datetime_from_string
+from .timezone import (
+    datetime_as_sgt,
+    datetime_from_string,
+    datetime_to_string,
+    is_datetime_between_range,
+)
 from .types import Url
 
 class DataGovSg:
@@ -85,14 +90,61 @@ class DataGovSg:
         """String representation"""
         return f'{self.__class__} ({USER_AGENT})'
 
+    @staticmethod
+    @typechecked
+    def validate_date(
+        kwargs: Any,
+        date_key: str,
+        error_message: str,
+        min_dt: datetime,
+        max_dt: datetime | None=None,
+    ) -> None:
+        """Validate that the datetime value in ``kwargs`` with key \
+            ``date_key`` is between ``min_dt`` and ``max_dt`` (inclusive).
+
+        :param kwargs: The dict of key-value arguments to check for the \
+            datetime value.
+        :type kwargs: Any (but is really dict[str, Any])
+
+        :param date_key: The key in ``kwargs`` that corresponds to the \
+            datetime value to check.
+        :type date_key: str
+
+        :param error_message: The error message to raise if the datetime value \
+            is not between ``min_dt`` and ``max_dt``.
+        :type error_message: str
+
+        :param min_dt: The earliest possible datetime value.
+        :type min_dt: datetime
+
+        :param max_dt: The latest possible datetime value. If None, then \
+            implies now datetime. Defaults to None.
+        :type max_dt: datetime or None
+
+        :raises ValueError: The datetime value is not between ``min_dt`` and \
+            ``max_dt``.
+
+        :return: None
+        """
+        if date_key in kwargs:
+            dt: datetime | date = kwargs[date_key]
+            if not is_datetime_between_range(
+                dt=dt if isinstance(dt, datetime) and not isinstance(dt, date) \
+                    else datetime_as_sgt(datetime(dt.year, dt.month, dt.day)),
+                min_dt=min_dt,
+                max_dt=max_dt,
+            ):
+                raise ValueError(error_message)
+
+    @staticmethod
     @typechecked
     def build_params(
-        self,
         params_expected_type: Any,
         original_params: Any,
-        default_params: dict | None=None,
+        default_params: dict[str, Any] | None=None,
         key_map: dict[str, str] | None=None,
-    ) -> dict:
+        remove_none_values: bool=True,
+    ) -> dict[str, Any]:
         """Build the list of parameters that are compatible for use with the \
             endpoint URLs, e.g. camelCase parameter names instead of Python's \
             snake_case, datetime objects to strings.
@@ -108,11 +160,15 @@ class DataGovSg:
         :param default_params: The set of parameters' default values. Should \
             be of the same type as what is specified in \
             ``params_expected_type``. Defaults to None.
-        :type default_params: dict or None
+        :type default_params: dict[str, Any] or None
 
         :param key_map: Mapping of keys used in ``params_expected_types`` to \
             keys expected by the endpoint. Defaults to None.
         :type key_map: dict[str, str] or None
+
+        :param remove_none_values: If True, then parameters with None values \
+            are removed from the returned parameters. Defaults to True.
+        :type remove_none_values: bool
 
         :return: The set of parameters that can be used with the API endpoints.
         :rtype: dict
@@ -123,22 +179,24 @@ class DataGovSg:
             key_map = {}
 
         joined_params = default_params | original_params
+        if remove_none_values:
+            joined_params = {
+                k: v \
+                    for k, v in joined_params.items() if v is not None
+            }
 
         # Ensure that the parameters match the expected input parameter types.
         _ = check_type(joined_params, params_expected_type)
 
-        params: dict = {}
+        params: dict[str, Any] = {}
         for key, value in joined_params.items():
             param_key = key_map[key] if key in key_map else key
 
             # Convert date and datetime to ISO format strings
             # Leave all other types as-is
-            # IMPORTANT! Test for `datetime` before `date`!
-            if isinstance(value, datetime):
-                params[param_key] = value.strftime('%Y-%m-%dT%H:%M:%S')
-            elif isinstance(value, date):
-                params[param_key] = value.strftime('%Y-%m-%d')
-            else:
+            try:
+                params[param_key] = datetime_to_string(value)
+            except TypeCheckError:
                 params[param_key] = value
 
         return params
@@ -155,7 +213,6 @@ class DataGovSg:
 
         - If ``iterate`` is True and value is a ``dict`` or ``list``: \
             sanitise the value's contents.
-        - Blank string: convert to None.
         - String that is like date or datetime: convert to ``datetime.date`` \
             or ``datetime.datetime`` object respectively.
         - String that is number-like: convert to ``int`` or ``float`` \
@@ -183,53 +240,67 @@ class DataGovSg:
         if ignore_keys is None:
             ignore_keys = []
 
-        sanitised_value: Any = value
-
-        if iterate and isinstance(value, list):
-            sanitised_value = [
-                self.sanitise_data(
-                    v,
-                    iterate=iterate,
-                    ignore_keys=ignore_keys,
-                    key_path=f'{key_path}[]'
-                ) for v in value
-            ]
-        elif iterate and isinstance(value, dict):
-            sanitised_value = {}
-            for k, v in value.items():
-                current_key_path = '.'.join([key_path, k]) if key_path else k
-                if isinstance(v, str) and v == '':
-                    sanitised_value[k] = self.sanitise_data(v)
-                elif current_key_path in ignore_keys:
-                    sanitised_value[k] = v
-                else:
-                    sanitised_value[k] = self.sanitise_data(
+        if iterate:
+            if isinstance(value, list):
+                return [
+                    self.sanitise_data(
                         v,
                         iterate=iterate,
                         ignore_keys=ignore_keys,
-                        key_path=current_key_path,
-                    )
-        elif isinstance(value, str):
-            if value == '':
-                sanitised_value = None
-            else:
+                        key_path=f'{key_path}[]'
+                    ) for v in value
+                ]
+
+            if isinstance(value, dict):
+                sanitised_dict = {}
+                for k, v in value.items():
+                    current_key_path = '.'.join([key_path, k]) \
+                        if key_path else k
+                    if current_key_path in ignore_keys:
+                        sanitised_dict[k] = v
+                    else:
+                        sanitised_dict[k] = self.sanitise_data(
+                            v,
+                            iterate=iterate,
+                            ignore_keys=ignore_keys,
+                            key_path=current_key_path,
+                        )
+                return sanitised_dict
+
+        if not isinstance(value, str):
+            return value
+
+        if ',' in value:
+            # Convert to tuple with numbers.
+            split_value = value.split(',')
+            tuple_value = tuple(
+                self.sanitise_data(
+                    v.strip(),
+                    iterate=False,
+                ) for v in split_value
+            )
+            values_are_int = all(isinstance(v, int) for v in tuple_value)
+            values_are_float = all(isinstance(v, float) for v in tuple_value)
+            if (values_are_int or values_are_float):
+                return tuple_value
+
+        try:
+            # pylint: disable=broad-exception-caught
+
+            # Convert to a date/datetime.
+            return datetime_from_string(value)
+        except Exception:
+            try:
+                # Convert to an integer
+                return int(value)
+            except Exception:
                 try:
-                    # pylint: disable=broad-exception-caught
-
-                    # Convert to a date/datetime.
-                    sanitised_value = datetime_from_string(value)
+                    # Convert to a float
+                    return float(value)
                 except Exception:
-                    try:
-                        # Convert to an integer
-                        sanitised_value = int(value)
-                    except Exception:
-                        try:
-                            # Convert to a float
-                            sanitised_value = float(value)
-                        except Exception:
-                            pass
+                    pass
 
-        return sanitised_value
+        return value
 
     @typechecked
     def send_request(

@@ -25,13 +25,14 @@ from .constants import (
     IPOS_DESIGNS_API_ENDPOINT,
     IPOS_PATENTS_API_ENDPOINT,
     IPOS_TRADEMARKS_API_ENDPOINT,
+
+    MIN_DATETIME,
+    MAX_DATETIME,
+
+    INVALID_DATE_ERROR_MESSAGE,
 )
 from .types_args import EconomyArgsDict
-from .types import (
-    DesignsDict,
-    PatentsDict,
-    TrademarksDict,
-)
+from .types import EconomyDict
 
 class Client(DataGovSg):
     """Interact with the economy-related endpoints.
@@ -41,7 +42,7 @@ class Client(DataGovSg):
     """
 
     @typechecked
-    def designs(self, **kwargs: Unpack[EconomyArgsDict]) -> DesignsDict:
+    def designs(self, **kwargs: Unpack[EconomyArgsDict]) -> EconomyDict:
         """Get design applications lodged with IPOS in Singapore.
 
         Updated daily from IPOS.
@@ -50,10 +51,21 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EconomyArgsDict
 
+        :raises ValueError: ``lodgement_date`` argument is not between 1 \
+            August 2018 and 31 October 2020 (start and end dates inclusive).
+
         :return: Design application information. (Cached for 12 hours.)
-        :rtype: DesignsDict
+        :rtype: EconomyDict
         """
-        designs: DesignsDict
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='lodgement_date',
+            error_message=INVALID_DATE_ERROR_MESSAGE,
+            min_dt=MIN_DATETIME,
+            max_dt=MAX_DATETIME,
+        )
+
+        designs: EconomyDict
 
         params = self.build_params(
             params_expected_type=EconomyArgsDict,
@@ -69,7 +81,7 @@ class Client(DataGovSg):
         return designs
 
     @typechecked
-    def patents(self, **kwargs: Unpack[EconomyArgsDict]) -> PatentsDict:
+    def patents(self, **kwargs: Unpack[EconomyArgsDict]) -> EconomyDict:
         """Get patent applications lodged with IPOS in Singapore.
 
         Updated daily from IPOS.
@@ -78,10 +90,21 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EconomyArgsDict
 
+        :raises ValueError: ``lodgement_date`` argument is not between 1 \
+            August 2018 and 31 October 2020 (start and end dates inclusive).
+
         :return: Patent application information. (Cached for 12 hours.)
-        :rtype: PatentsDict
+        :rtype: EconomyDict
         """
-        patents: PatentsDict
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='lodgement_date',
+            error_message=INVALID_DATE_ERROR_MESSAGE,
+            min_dt=MIN_DATETIME,
+            max_dt=MAX_DATETIME,
+        )
+
+        patents: EconomyDict
 
         params = self.build_params(
             params_expected_type=EconomyArgsDict,
@@ -97,7 +120,7 @@ class Client(DataGovSg):
         return patents
 
     @typechecked
-    def trademarks(self, **kwargs: Unpack[EconomyArgsDict]) -> TrademarksDict:
+    def trademarks(self, **kwargs: Unpack[EconomyArgsDict]) -> EconomyDict:
         """Get trademark applications lodged with IPOS in Singapore.
 
         Updated daily from IPOS.
@@ -106,10 +129,21 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EconomyArgsDict
 
+        :raises ValueError: ``lodgement_date`` argument is not between 1 \
+            August 2018 and 31 October 2020 (start and end dates inclusive).
+
         :return: Trademark application information. (Cached for 12 hours.)
-        :rtype: TrademarksDict
+        :rtype: EconomyDict
         """
-        trademarks: TrademarksDict
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='lodgement_date',
+            error_message=INVALID_DATE_ERROR_MESSAGE,
+            min_dt=MIN_DATETIME,
+            max_dt=MAX_DATETIME,
+        )
+
+        trademarks: EconomyDict
 
         params = self.build_params(
             params_expected_type=EconomyArgsDict,

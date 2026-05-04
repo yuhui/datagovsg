@@ -449,7 +449,7 @@ class _WeatherRecordItemDict(TypedDict):
     isStationData: bool
     """Indicates whether the weather information includes station information.
 
-    :example: False
+    :example: ``False``
     """
     readings: list[
         _FloodAlertRecordItemReadingDict \

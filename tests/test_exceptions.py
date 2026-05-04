@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Yuhui
+# Copyright 2019-2026 Yuhui
 #
 # Licensed under the GNU General Public License, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,26 +20,54 @@ import pytest
 
 from datagovsg.exceptions import APIError
 
+DEFAULT_MESSAGE = 'Unexpected error occurred.'
+ERRORS_MESSAGE = 'Inspect the "errors" attribute for error details.'
+DATA_MESSAGE = 'Inspect the "data" attribute for the response data.'
+
 @pytest.mark.parametrize(
     ('message', 'data', 'errors'),
     [
-        ('pytest', None, None),
+        ('pytest', {'Message': 'pytest message'}, {'error': 'pytest error'}),
         ('pytest', {'Message': 'pytest message'}, None),
         ('pytest', None, {'error': 'pytest error'}),
-        ('pytest', {'Message': 'pytest message'}, {'error': 'pytest error'}),
+        (None, {'Message': 'pytest message'}, {'error': 'pytest error'}),
+        ('pytest', None, None),
+        (None, {'Message': 'pytest message'}, None),
+        (None, None, {'error': 'pytest error'}),
+        (None, None, None),
     ],
 )
 def test_raising_APIError(message, data, errors):
     with pytest.raises(APIError) as excinfo:
-        raise APIError(message=message, data=data, errors=errors)
+        if message and data and errors:
+            raise APIError(message=message, data=data, errors=errors)
+        elif message and data:
+            raise APIError(message=message, data=data)
+        elif message and errors:
+            raise APIError(message=message, errors=errors)
+        elif data and errors:
+            raise APIError(data=data, errors=errors)
+        elif message:
+            raise APIError(message=message)
+        elif data:
+            raise APIError(data=data)
+        elif errors:
+            raise APIError(errors=errors)
+        else:
+            raise APIError()
 
-    assert excinfo.value.args[0] == message
-    assert excinfo.value.message == message
-    if data is None:
-        assert not hasattr(excinfo.value, 'data')
-    else:
-        assert excinfo.value.data == data
+    expected_error_message = message if message else DEFAULT_MESSAGE
+
     if errors is None:
         assert not hasattr(excinfo.value, 'errors')
     else:
+        expected_error_message = f'{expected_error_message} {ERRORS_MESSAGE}'
         assert excinfo.value.errors == errors
+
+    if data is None:
+        assert not hasattr(excinfo.value, 'data')
+    else:
+        expected_error_message = f'{expected_error_message} {DATA_MESSAGE}'
+        assert excinfo.value.data == data
+
+    assert excinfo.value.message == expected_error_message

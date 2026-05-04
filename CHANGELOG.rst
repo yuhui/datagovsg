@@ -1,6 +1,24 @@
 Changelog
 =========
 
+[2.2.0] - 2026-05-04
+--------------------
+
+Added
+^^^^^
+
+- Check that dates in methods' arguments are within the range of dates for which data is available.
+
+Changed
+^^^^^^^
+
+- Change Economy methods' response types to be more generic.
+    - This is due to the poor state of the documentation about the response types.
+- Update list of allowed date string formats.
+- When building parameters, allow whether to remove parameters with ``None`` values.
+- Sanitised comma-separated numbers as tuples of those numbers.
+- Set default error message and also mention if `data` and/or `errors` attributes are set in the error.
+
 [2.1.0] - 2026-04-05
 --------------------
 

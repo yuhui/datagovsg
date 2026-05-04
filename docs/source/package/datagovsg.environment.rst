@@ -7,10 +7,11 @@ Example usage:
 
 .. code-block:: python
 
-    # get the 24-hour weather forecast
-    from datagovsg import Environment
-    environment = Environment()
-    forecast = environment.twenty_four_hour_weather_forecast()
+    # get the latest lightning observations
+   from datagovsg import Environment
+   from datagovsg.environment.types import WeatherDict
+   environment = Environment()
+   lightning: WeatherDict = environment.lightning()
 
 Methods
 -------

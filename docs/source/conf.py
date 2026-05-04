@@ -28,6 +28,7 @@
 
 import os
 import sys
+from datetime import date
 
 sys.path.insert(0, os.path.abspath('../..'))
 
@@ -39,7 +40,7 @@ from datagovsg.version import VERSION
 # -- Project information -----------------------------------------------------
 
 project = NAME
-copyright = f'2019-2025, {AUTHOR}'
+copyright = f'2019-{date.today().year}, {AUTHOR}'
 
 # The full version, including alpha/beta/rc tags
 release = VERSION

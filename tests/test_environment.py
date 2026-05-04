@@ -76,7 +76,7 @@ TEST_DATE_YESTERDAY = TEST_DATE - timedelta(days=1)
 TEST_DATE_STRING = TEST_DATE.strftime('%Y-%m-%d')
 TEST_DATETIME_STRING = TEST_DATETIME.strftime('%Y-%m-%dT%H:%M:%S')
 
-TEST_PARAMETERS_AND_MOCKS = [
+TEST_DATA = [
     (
         'air_temperature',
         EnvironmentReadingDict,
@@ -148,6 +148,12 @@ TEST_PARAMETERS_AND_MOCKS = [
         APIResponseWindSpeed,
     ),
 ]
+TEST_METHODS_AND_EXPECTED_TYPES = [
+    (method, expected_type) for method, expected_type, _ in TEST_DATA
+]
+TEST_METHODS_AND_MOCKS = [
+    (method, mocked_response) for method, _, mocked_response in TEST_DATA
+]
 
 @pytest.fixture(scope='module')
 def client():
@@ -156,19 +162,10 @@ def client():
     return Environment(api_key)
 
 @pytest.mark.parametrize(
-    (
-        'method',
-        'expected_type',
-        'mocked_response_method',
-    ),
-    TEST_PARAMETERS_AND_MOCKS,
+    ('method', 'expected_type'),
+    TEST_METHODS_AND_EXPECTED_TYPES,
 )
-def test_environment_methods(
-    client,
-    method,
-    expected_type,
-    mocked_response_method,
-):
+def test_environment_methods(client, method, expected_type):
     try:
         data = getattr(client, method, None)()
     except Exception:
@@ -179,22 +176,17 @@ def test_environment_methods(
     assert check_type(data, expected_type) == data
 
 @pytest.mark.parametrize(
-    (
-        'method',
-        'expected_type',
-        'mocked_response_method',
-    ),
-    TEST_PARAMETERS_AND_MOCKS,
+    ('method', 'mocked_response'),
+    TEST_METHODS_AND_MOCKS,
 )
 def test_environment_methods_with_date(
     client,
     method,
-    expected_type,
-    mocked_response_method,
+    mocked_response,
     monkeypatch,
 ):
     def mock_requests_get(*args, **kwargs):
-        return mocked_response_method()
+        return mocked_response()
 
     monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 
@@ -208,22 +200,17 @@ def test_environment_methods_with_date(
     assert kwargs['params']['date'] == TEST_DATE_STRING
 
 @pytest.mark.parametrize(
-    (
-        'method',
-        'expected_type',
-        'mocked_response_method',
-    ),
-    TEST_PARAMETERS_AND_MOCKS,
+    ('method', 'mocked_response'),
+    TEST_METHODS_AND_MOCKS,
 )
 def test_environment_methods_with_datetime(
     client,
     method,
-    expected_type,
-    mocked_response_method,
+    mocked_response,
     monkeypatch,
 ):
     def mock_requests_get(*args, **kwargs):
-        return mocked_response_method()
+        return mocked_response()
 
     monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 

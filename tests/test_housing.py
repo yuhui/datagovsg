@@ -27,22 +27,32 @@ from requests_cache import CachedSession
 from typeguard import check_type
 
 from datagovsg import Housing
+from datagovsg.housing.constants import INVALID_DATETIME_ERROR_MESSAGE
 from datagovsg.housing.types import CarparkAvailabilityItemDict
 
 from .mocks.api_response_housing import APIResponseCarparkAvailability
 
-TEST_DATETIME = datetime(
-    2026, 1, 12, 0, 15, 0,
+BAD_DATETIME = datetime(
+    2000, 1, 1, 0, 0, 0,
     tzinfo=ZoneInfo('Asia/Singapore'),
 )
-TEST_DATETIME_STRING = TEST_DATETIME.strftime('%Y-%m-%dT%H:%M:%S')
+GOOD_DATETIME = datetime.now(ZoneInfo('Asia/Singapore'))
+GOOD_DATETIME_STRING = GOOD_DATETIME.strftime('%Y-%m-%dT%H:%M:%S')
 
-TEST_PARAMETERS_AND_MOCKS = [
+TEST_DATA = [
     (
         'carpark_availability',
         list[CarparkAvailabilityItemDict],
         APIResponseCarparkAvailability,
-    )
+    ),
+]
+TEST_METHODS = [method for method, _, _ in TEST_DATA]
+TEST_METHODS_AND_EXPECTED_TYPES = [
+    (method, expected_type) for method, expected_type, _ in TEST_DATA
+]
+TEST_METHODS_AND_MOCK_RESPONSE_METHODS = [
+    (method, mock_response_method) \
+        for method, _, mock_response_method in TEST_DATA
 ]
 
 @pytest.fixture(scope='module')
@@ -52,48 +62,47 @@ def client():
     return Housing(api_key)
 
 @pytest.mark.parametrize(
-    (
-        'method',
-        'expected_type',
-        'mocked_response_method',
-    ),
-    TEST_PARAMETERS_AND_MOCKS,
+    ('method', 'expected_type'),
+    TEST_METHODS_AND_EXPECTED_TYPES,
 )
-def test_housing_methods(
-    client,
-    method,
-    expected_type,
-    mocked_response_method,
-):
+def test_housing_methods(client, method, expected_type):
     data = getattr(client, method, None)()
 
     assert check_type(data, expected_type) == data
 
 @pytest.mark.parametrize(
-    (
-        'method',
-        'expected_type',
-        'mocked_response_method',
-    ),
-    TEST_PARAMETERS_AND_MOCKS,
+    ('method', 'mock_response_method'),
+    TEST_METHODS_AND_MOCK_RESPONSE_METHODS,
 )
-def test_housing_methods_with_datetime(
+def test_housing_methods_with_good_datetime(
     client,
     method,
-    expected_type,
-    mocked_response_method,
+    mock_response_method,
     monkeypatch,
 ):
     def mock_requests_get(*args, **kwargs):
-        return mocked_response_method()
+        return mock_response_method()
 
     monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
 
     original_send_request = client.send_request
     client.send_request = Mock(side_effect=original_send_request)
 
-    _ = getattr(client, method, None)(date_time=TEST_DATETIME)
+    try:
+        _ = getattr(client, method, None)(date_time=GOOD_DATETIME)
+    except ValueError as excinfo:
+        pytest.fail(f'Unexpected ValueError raised: {excinfo}')
 
     client.send_request.assert_called_once()
     _, kwargs = client.send_request.call_args
-    assert kwargs['params']['date_time'] == TEST_DATETIME_STRING
+    assert kwargs['params']['date_time'] == GOOD_DATETIME_STRING
+
+@pytest.mark.parametrize(
+    ('method'),
+    TEST_METHODS,
+)
+def test_economy_methods_with_bad_datetime(client, method):
+    with pytest.raises(ValueError) as excinfo:
+        _ = getattr(client, method, None)(date_time=BAD_DATETIME)
+
+    assert str(excinfo.value) == INVALID_DATETIME_ERROR_MESSAGE

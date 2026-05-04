@@ -15,17 +15,17 @@
 """Data.gov.sg custom types for Economy client methods' arguments."""
 
 from datetime import date
-from typing import NotRequired, TypedDict
+from typing import TypedDict
 
 class EconomyArgsDict(TypedDict):
     """Type definition for designs(), patents() and trademarks() input \
         arguments
     """
 
-    lodgement_date: NotRequired[date]
+    lodgement_date: date
     """Retrieve applications lodged at that moment in time.
 
-    :example: date(2025, 1, 12)
+    :example: date(2020, 1, 12)
     """
 
 __all__ = [

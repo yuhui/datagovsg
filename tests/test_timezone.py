@@ -16,7 +16,7 @@
 
 """Test that the timezone functions are working properly."""
 
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -132,6 +132,14 @@ def test_datetime_as_sgt(date_time, expected_hour):
             '2019-07-13',
             date(2019, 7, 13),
         ),
+        (
+            '13/07/2019',
+            date(2019, 7, 13),
+        ),
+        (
+            '13/7/2019',
+            date(2019, 7, 13),
+        ),
         # time only with seconds
         (
             '08:32:17.456+08:00',
@@ -182,6 +190,36 @@ def test_datetime_from_string(date_time_str, expected_date_time):
     assert date_time == expected_date_time
 
 @pytest.mark.parametrize(
+    ('date_time', 'expected_date_time_str'),
+    [
+        # date and time
+        (
+            datetime(
+                2019, 7, 13, 8, 32, 17,
+                tzinfo=SGT_TIMEZONE,
+            ),
+            '2019-07-13T08:32:17',
+        ),
+        # date and time with microseconds
+        (
+            datetime(
+                2019, 7, 13, 8, 32, 17, 456000,
+                tzinfo=SGT_TIMEZONE,
+            ),
+            '2019-07-13T08:32:17',
+        ),
+        # date only
+        (
+            date(2019, 7, 13),
+            '2019-07-13',
+        ),
+    ],
+)
+def test_datetime_to_string(date_time, expected_date_time_str):
+    date_time_str = timezone.datetime_to_string(date_time)
+    assert date_time_str == expected_date_time_str
+
+@pytest.mark.parametrize(
     'date_time_str',
     [
         'foobar',
@@ -193,3 +231,69 @@ def test_datetime_from_string(date_time_str, expected_date_time):
 def test_datetime_from_bad_string(date_time_str):
     with pytest.raises(ValueError):
         _ = timezone.datetime_from_string(date_time_str)
+
+@pytest.mark.parametrize(
+    ('dt', 'min_dt', 'max_dt', 'expected_result'),
+    [
+        # all inputs are provided
+        (
+            datetime(2019, 7, 13, 8, 32, 56, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 1, 1, 0, 0, 0, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 12, 31, 23, 59, 59, tzinfo=SGT_TIMEZONE),
+            True,
+        ),
+        # datetime is same as min_dt
+        (
+            datetime(2019, 1, 1, 0, 0, 0, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 1, 1, 0, 0, 0, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 12, 31, 23, 59, 59, tzinfo=SGT_TIMEZONE),
+            True,
+        ),
+        # datetime is same as max_dt
+        (
+            datetime(2019, 12, 31, 23, 59, 59, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 1, 1, 0, 0, 0, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 12, 31, 23, 59, 59, tzinfo=SGT_TIMEZONE),
+            True,
+        ),
+        # max_dt is not provided
+        (
+            datetime(2019, 12, 31, 23, 59, 59, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 1, 1, 0, 0, 0, tzinfo=SGT_TIMEZONE),
+            None,
+            True,
+        ),
+        # datetime is before min_dt
+        (
+            datetime(2018, 7, 13, 8, 32, 56, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 1, 1, 0, 0, 0, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 12, 31, 23, 59, 59, tzinfo=SGT_TIMEZONE),
+            False,
+        ),
+        # datetime is after max_dt
+        (
+            datetime(2020, 7, 13, 8, 32, 56, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 1, 1, 0, 0, 0, tzinfo=SGT_TIMEZONE),
+            datetime(2019, 12, 31, 23, 59, 59, tzinfo=SGT_TIMEZONE),
+            False,
+        ),
+    ],
+)
+def test_is_datetime_between_range_with_valid_inputs(
+    dt,
+    min_dt,
+    max_dt,
+    expected_result,
+):
+    result = timezone.is_datetime_between_range(dt, min_dt, max_dt)
+    assert result == expected_result
+
+def test_is_datetime_between_range_with_invalid_inputs():
+    with pytest.raises(ValueError) as excinfo:
+        _ = timezone.is_datetime_between_range(
+            dt=datetime(2019, 7, 13, 8, 32, 56, tzinfo=SGT_TIMEZONE),
+            min_dt=datetime(2019, 12, 31, 23, 59, 59, tzinfo=SGT_TIMEZONE),
+            max_dt=datetime(2019, 1, 1, 0, 0, 0, tzinfo=SGT_TIMEZONE),
+        )
+
+    assert str(excinfo.value) == 'min_dt is after max_dt'

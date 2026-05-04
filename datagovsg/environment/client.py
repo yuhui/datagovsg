@@ -49,6 +49,34 @@ from .constants import (
     WBGT_DEFAULT_PARAMS,
 
     WIND_SPEED_SANITISE_IGNORE_KEYS,
+
+    AIR_TEMPERATURE_MIN_DATETIME,
+    FOUR_DAY_WEATHER_FORECAST_MIN_DATETIME,
+    LIGHTNING_MIN_DATETIME,
+    PM25_MIN_DATETIME,
+    PSI_MIN_DATETIME,
+    RAINFALL_MIN_DATETIME,
+    RELATIVE_HUMIDITY_MIN_DATETIME,
+    UV_MIN_DATETIME,
+    TWENTY_FOUR_HOUR_WEATHER_FORECAST_MIN_DATETIME,
+    TWO_HOUR_WEATHER_FORECAST_MIN_DATETIME,
+    WBGT_MIN_DATETIME,
+    WIND_DIRECTION_MIN_DATETIME,
+    WIND_SPEED_MIN_DATETIME,
+
+    INVALID_AIR_TEMPERATURE_DATETIME_ERROR_MESSAGE,
+    INVALID_FOUR_DAY_WEATHER_FORECAST_DATETIME_ERROR_MESSAGE,
+    INVALID_LIGHTNING_DATETIME_ERROR_MESSAGE,
+    INVALID_PM25_DATETIME_ERROR_MESSAGE,
+    INVALID_PSI_DATETIME_ERROR_MESSAGE,
+    INVALID_RAINFALL_DATETIME_ERROR_MESSAGE,
+    INVALID_RELATIVE_HUMIDITY_DATETIME_ERROR_MESSAGE,
+    INVALID_TWENTY_FOUR_HOUR_WEATHER_FORECAST_DATETIME_ERROR_MESSAGE,
+    INVALID_TWO_HOUR_WEATHER_FORECAST_DATETIME_ERROR_MESSAGE,
+    INVALID_UV_DATETIME_ERROR_MESSAGE,
+    INVALID_WBGT_DATETIME_ERROR_MESSAGE,
+    INVALID_WIND_DIRECTION_DATETIME_ERROR_MESSAGE,
+    INVALID_WIND_SPEED_DATETIME_ERROR_MESSAGE,
 )
 from .types_args import EnvironmentArgsDict, WeatherArgsDict
 from .types import (
@@ -82,9 +110,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 May 2016 \
+            12:00am (inclusive).
+
         :return: Air Temperature Information. (Cached for 1 minute.)
         :rtype: EnvironmentReadingDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_AIR_TEMPERATURE_DATETIME_ERROR_MESSAGE,
+            min_dt=AIR_TEMPERATURE_MIN_DATETIME,
+        )
+
         air_temperature: EnvironmentReadingDict
 
         params = self.build_params(
@@ -141,9 +179,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: WeatherArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 February 2025 \
+            12:00am (inclusive).
+
         :return: Lightning Information. (Cached for 30 minutse.)
         :rtype: WeatherDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_LIGHTNING_DATETIME_ERROR_MESSAGE,
+            min_dt=LIGHTNING_MIN_DATETIME,
+        )
+
         lightning: WeatherDict
 
         params = self.build_params(
@@ -170,9 +218,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 February 2016 \
+            12:00am (inclusive).
+
         :return: PM 2.5 Information. (Cached for 1 hour.)
         :rtype: PM25Dict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_PM25_DATETIME_ERROR_MESSAGE,
+            min_dt=PM25_MIN_DATETIME,
+        )
+
         pm25: PM25Dict
 
         params = self.build_params(
@@ -198,9 +256,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 February 2016 \
+            12:00am (inclusive).
+
         :return: PSI Information. (Cached for 1 hour.)
         :rtype: PSIDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_PSI_DATETIME_ERROR_MESSAGE,
+            min_dt=PSI_MIN_DATETIME,
+        )
+
         psi: PSIDict
 
         params = self.build_params(
@@ -229,9 +297,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 December 2016 \
+            12:00am (inclusive).
+
         :return: Rainfall Information. (Cached for 5 minutes.)
         :rtype: EnvironmentReadingDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_RAINFALL_DATETIME_ERROR_MESSAGE,
+            min_dt=RAINFALL_MIN_DATETIME,
+        )
+
         rainfall: EnvironmentReadingDict
 
         params = self.build_params(
@@ -260,9 +338,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 November 2016 \
+            12:00am (inclusive).
+
         :return: Relative Humidity Information. (Cached for 1 minute.)
         :rtype: EnvironmentReadingDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_RELATIVE_HUMIDITY_DATETIME_ERROR_MESSAGE,
+            min_dt=RELATIVE_HUMIDITY_MIN_DATETIME,
+        )
+
         relative_humidity: EnvironmentReadingDict
 
         params = self.build_params(
@@ -289,9 +377,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 March 2016 \
+            12:00am (inclusive).
+
         :return: UV Index Information. (Cached for 1 hour.)
         :rtype: UVIndexDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_UV_DATETIME_ERROR_MESSAGE,
+            min_dt=UV_MIN_DATETIME,
+        )
+
         uv_index: UVIndexDict
 
         params = self.build_params(
@@ -317,10 +415,20 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: WeatherArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 February 2025 \
+            12:00am (inclusive).
+
         :return: Wet Bulb Globe Temperature Information. (Cached for 30 \
             minutse.)
         :rtype: WeatherDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_WBGT_DATETIME_ERROR_MESSAGE,
+            min_dt=WBGT_MIN_DATETIME,
+        )
+
         wbgt: WeatherDict
 
         params = self.build_params(
@@ -350,9 +458,20 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 March 2016 \
+            12:00am (inclusive).
+
         :return: 2 Hour Weather Forecast. (Cached for 30 minutes.)
         :rtype: WeatherForecastTwoHourDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=\
+                INVALID_TWO_HOUR_WEATHER_FORECAST_DATETIME_ERROR_MESSAGE,
+            min_dt=TWO_HOUR_WEATHER_FORECAST_MIN_DATETIME,
+        )
+
         two_hour_weather_forecast: WeatherForecastTwoHourDict
 
         params = self.build_params(
@@ -381,9 +500,20 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 March 2016 \
+            12:00am (inclusive).
+
         :return: 24 Hour Weather Forecast. (Cached for 1 hour.)
         :rtype: WeatherForecastTwentyFourHourDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=\
+                INVALID_TWENTY_FOUR_HOUR_WEATHER_FORECAST_DATETIME_ERROR_MESSAGE,
+            min_dt=TWENTY_FOUR_HOUR_WEATHER_FORECAST_MIN_DATETIME,
+        )
+
         twenty_four_hour_weather_forecast: WeatherForecastTwentyFourHourDict
 
         params = self.build_params(
@@ -412,9 +542,20 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 March 2016 \
+            12:00am (inclusive).
+
         :return: 4 Day Weather Forecast. (Cached for 12 hours.)
         :rtype: WeatherForecastFourDayDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=\
+                INVALID_FOUR_DAY_WEATHER_FORECAST_DATETIME_ERROR_MESSAGE,
+            min_dt=FOUR_DAY_WEATHER_FORECAST_MIN_DATETIME,
+        )
+
         four_day_weather_forecast: WeatherForecastFourDayDict
 
         params = self.build_params(
@@ -443,9 +584,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 November 2016 \
+            12:00am (inclusive).
+
         :return: Wind Direction Information. (Cached for 1 minute.)
         :rtype: EnvironmentReadingDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_WIND_DIRECTION_DATETIME_ERROR_MESSAGE,
+            min_dt=WIND_DIRECTION_MIN_DATETIME,
+        )
+
         wind_direction: EnvironmentReadingDict
 
         params = self.build_params(
@@ -474,9 +625,19 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EnvironmentArgsDict
 
+        :raises ValueError: ``date`` argument is before 1 December 2016 \
+            12:00am (inclusive).
+
         :return: Wind Speed Information. (Cached for 1 minute.)
         :rtype: EnvironmentReadingDict
         """
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='date',
+            error_message=INVALID_WIND_SPEED_DATETIME_ERROR_MESSAGE,
+            min_dt=WIND_SPEED_MIN_DATETIME,
+        )
+
         wind_speed: EnvironmentReadingDict
 
         params = self.build_params(

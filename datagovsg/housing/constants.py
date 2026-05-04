@@ -14,7 +14,10 @@
 
 """Constants for all Housing-related APIs."""
 
+from datetime import datetime
+
 from ..constants import BASE_V1_API_ENDPOINT
+from ..timezone import datetime_as_sgt
 
 TRANSPORT_API_ENDPOINT = f'{BASE_V1_API_ENDPOINT}/transport'
 
@@ -25,8 +28,18 @@ CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS = [
     '[].carpark_data[].carpark_number',
 ]
 
+MIN_DATETIME = datetime_as_sgt(datetime(2018, 1, 1, 0, 0, 0))
+
+INVALID_DATETIME_ERROR_MESSAGE_FORMAT = 'date_time must be on or after {}.'
+INVALID_DATETIME_ERROR_MESSAGE = INVALID_DATETIME_ERROR_MESSAGE_FORMAT.format(
+    MIN_DATETIME,
+)
+
 __all__ = [
     'CARPARK_AVAILABILITY_API_ENDPOINT',
 
     'CARPARK_AVAILABILITY_SANITISE_IGNORE_KEYS',
+
+    'MIN_DATETIME',
+    'INVALID_DATETIME_ERROR_MESSAGE',
 ]
