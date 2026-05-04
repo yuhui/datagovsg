@@ -165,7 +165,6 @@ class DataGovSg:
 
         - If ``iterate`` is True and value is a ``dict`` or ``list``: \
             sanitise the value's contents.
-        - Blank string: convert to None.
         - String that is like date or datetime: convert to ``datetime.date`` \
             or ``datetime.datetime`` object respectively.
         - String that is number-like: convert to ``int`` or ``float`` \
@@ -193,53 +192,67 @@ class DataGovSg:
         if ignore_keys is None:
             ignore_keys = []
 
-        sanitised_value: Any = value
-
-        if iterate and isinstance(value, list):
-            sanitised_value = [
-                self.sanitise_data(
-                    v,
-                    iterate=iterate,
-                    ignore_keys=ignore_keys,
-                    key_path=f'{key_path}[]'
-                ) for v in value
-            ]
-        elif iterate and isinstance(value, dict):
-            sanitised_value = {}
-            for k, v in value.items():
-                current_key_path = '.'.join([key_path, k]) if key_path else k
-                if isinstance(v, str) and v == '':
-                    sanitised_value[k] = self.sanitise_data(v)
-                elif current_key_path in ignore_keys:
-                    sanitised_value[k] = v
-                else:
-                    sanitised_value[k] = self.sanitise_data(
+        if iterate:
+            if isinstance(value, list):
+                return [
+                    self.sanitise_data(
                         v,
                         iterate=iterate,
                         ignore_keys=ignore_keys,
-                        key_path=current_key_path,
-                    )
-        elif isinstance(value, str):
-            if value == '':
-                sanitised_value = None
-            else:
+                        key_path=f'{key_path}[]'
+                    ) for v in value
+                ]
+
+            if isinstance(value, dict):
+                sanitised_dict = {}
+                for k, v in value.items():
+                    current_key_path = '.'.join([key_path, k]) \
+                        if key_path else k
+                    if current_key_path in ignore_keys:
+                        sanitised_dict[k] = v
+                    else:
+                        sanitised_dict[k] = self.sanitise_data(
+                            v,
+                            iterate=iterate,
+                            ignore_keys=ignore_keys,
+                            key_path=current_key_path,
+                        )
+                return sanitised_dict
+
+        if not isinstance(value, str):
+            return value
+
+        if ',' in value:
+            # Convert to tuple with numbers.
+            split_value = value.split(',')
+            tuple_value = tuple(
+                self.sanitise_data(
+                    v.strip(),
+                    iterate=False,
+                ) for v in split_value
+            )
+            values_are_int = all(isinstance(v, int) for v in tuple_value)
+            values_are_float = all(isinstance(v, float) for v in tuple_value)
+            if (values_are_int or values_are_float):
+                return tuple_value
+
+        try:
+            # pylint: disable=broad-exception-caught
+
+            # Convert to a date/datetime.
+            return datetime_from_string(value)
+        except Exception:
+            try:
+                # Convert to an integer
+                return int(value)
+            except Exception:
                 try:
-                    # pylint: disable=broad-exception-caught
-
-                    # Convert to a date/datetime.
-                    sanitised_value = datetime_from_string(value)
+                    # Convert to a float
+                    return float(value)
                 except Exception:
-                    try:
-                        # Convert to an integer
-                        sanitised_value = int(value)
-                    except Exception:
-                        try:
-                            # Convert to a float
-                            sanitised_value = float(value)
-                        except Exception:
-                            pass
+                    pass
 
-        return sanitised_value
+        return value
 
     @typechecked
     def send_request(
