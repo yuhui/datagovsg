@@ -142,7 +142,44 @@ def datetime_to_string(dt: datetime | date) -> str:
         else dt.strftime('%Y-%m-%d')
     return val
 
+@typechecked
+def is_datetime_between_range(
+    dt: datetime,
+    min_dt: datetime,
+    max_dt: datetime | None=None,
+) -> bool:
+    """Check if a datetime is between the first and last datetimes (inclusive).
+
+    :param dt: Datetime to check.
+    :type dt: datetime
+
+    :param min_dt: Earliest possible datetime.
+    :type dt: datetime
+
+    :param max_dt: Latest possible datetime. If None, then defaults to now.
+    :type dt: datetime or None
+
+    :raises ValueError: ``min_dt`` is after ``max_dt``.
+
+    :return: ``True`` if the datetime is between the first and last datetimes.
+    :rtype: bool
+    """
+    result: bool
+
+    if max_dt is None:
+        max_dt = datetime.now()
+
+    if datetime_as_sgt(min_dt) > datetime_as_sgt(max_dt):
+        raise ValueError('min_dt is after max_dt')
+
+    result = datetime_as_sgt(min_dt) <= datetime_as_sgt(dt) <= \
+        datetime_as_sgt(max_dt)
+
+    return result
+
 __all__ = [
+    'datetime_as_sgt',
     'datetime_from_string',
     'datetime_to_string',
+    'is_datetime_between_range',
 ]

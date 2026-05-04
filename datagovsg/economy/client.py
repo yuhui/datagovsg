@@ -25,6 +25,11 @@ from .constants import (
     IPOS_DESIGNS_API_ENDPOINT,
     IPOS_PATENTS_API_ENDPOINT,
     IPOS_TRADEMARKS_API_ENDPOINT,
+
+    MIN_DATETIME,
+    MAX_DATETIME,
+
+    INVALID_DATE_ERROR_MESSAGE,
 )
 from .types_args import EconomyArgsDict
 from .types import (
@@ -50,10 +55,21 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EconomyArgsDict
 
+        :raises ValueError: ``lodgement_date`` argument is not between 1 \
+            August 2018 and 31 October 2020 (start and end dates inclusive).
+
         :return: Design application information. (Cached for 12 hours.)
         :rtype: DesignsDict
         """
         designs: DesignsDict
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='lodgement_date',
+            error_message=INVALID_DATE_ERROR_MESSAGE,
+            min_dt=MIN_DATETIME,
+            max_dt=MAX_DATETIME,
+        )
+
 
         params = self.build_params(
             params_expected_type=EconomyArgsDict,
@@ -78,10 +94,21 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EconomyArgsDict
 
+        :raises ValueError: ``lodgement_date`` argument is not between 1 \
+            August 2018 and 31 October 2020 (start and end dates inclusive).
+
         :return: Patent application information. (Cached for 12 hours.)
         :rtype: PatentsDict
         """
         patents: PatentsDict
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='lodgement_date',
+            error_message=INVALID_DATE_ERROR_MESSAGE,
+            min_dt=MIN_DATETIME,
+            max_dt=MAX_DATETIME,
+        )
+
 
         params = self.build_params(
             params_expected_type=EconomyArgsDict,
@@ -106,10 +133,21 @@ class Client(DataGovSg):
             endpoint URL.
         :type kwargs: EconomyArgsDict
 
+        :raises ValueError: ``lodgement_date`` argument is not between 1 \
+            August 2018 and 31 October 2020 (start and end dates inclusive).
+
         :return: Trademark application information. (Cached for 12 hours.)
         :rtype: TrademarksDict
         """
         trademarks: TrademarksDict
+        self.validate_date(
+            kwargs=kwargs,
+            date_key='lodgement_date',
+            error_message=INVALID_DATE_ERROR_MESSAGE,
+            min_dt=MIN_DATETIME,
+            max_dt=MAX_DATETIME,
+        )
+
 
         params = self.build_params(
             params_expected_type=EconomyArgsDict,

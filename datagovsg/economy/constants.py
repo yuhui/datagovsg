@@ -14,7 +14,10 @@
 
 """Constants for all Economy-related APIs."""
 
+from datetime import datetime
+
 from ..constants import BASE_V1_API_ENDPOINT
+from ..timezone import datetime_as_sgt
 
 ECONOMY_API_ENDPOINT = f'{BASE_V1_API_ENDPOINT}/technology'
 
@@ -24,8 +27,22 @@ IPOS_DESIGNS_API_ENDPOINT = f'{IPOS_API_ENDPOINT}/designs'
 IPOS_PATENTS_API_ENDPOINT = f'{IPOS_API_ENDPOINT}/patents'
 IPOS_TRADEMARKS_API_ENDPOINT = f'{IPOS_API_ENDPOINT}/trademarks'
 
+MIN_DATETIME = datetime_as_sgt(datetime(2018, 8, 1, 0, 0, 0))
+MAX_DATETIME = datetime_as_sgt(datetime(2020, 10, 31, 23, 59, 59))
+
+INVALID_DATE_ERROR_MESSAGE_FORMAT = \
+    'lodgement_date must be between {} and {} (inclusive)'
+INVALID_DATE_ERROR_MESSAGE = INVALID_DATE_ERROR_MESSAGE_FORMAT.format(
+    MIN_DATETIME,
+    MAX_DATETIME,
+)
+
 __all__ = [
     'IPOS_DESIGNS_API_ENDPOINT',
     'IPOS_PATENTS_API_ENDPOINT',
     'IPOS_TRADEMARKS_API_ENDPOINT',
+
+    'MIN_DATETIME',
+    'MAX_DATETIME',
+    'INVALID_DATE_ERROR_MESSAGE',
 ]

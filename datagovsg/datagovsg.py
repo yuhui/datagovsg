@@ -25,8 +25,10 @@ from typeguard import check_type, typechecked, TypeCheckError
 from .constants import CACHE_NAME, USER_AGENT
 from .exceptions import APIError
 from .timezone import (
+    datetime_as_sgt,
     datetime_from_string,
     datetime_to_string,
+    is_datetime_between_range,
 )
 from .types import Url
 
@@ -87,6 +89,52 @@ class DataGovSg:
     def __repr__(self) -> str:
         """String representation"""
         return f'{self.__class__} ({USER_AGENT})'
+
+    @staticmethod
+    @typechecked
+    def validate_date(
+        kwargs: Any,
+        date_key: str,
+        error_message: str,
+        min_dt: datetime,
+        max_dt: datetime | None=None,
+    ) -> None:
+        """Validate that the datetime value in ``kwargs`` with key \
+            ``date_key`` is between ``min_dt`` and ``max_dt`` (inclusive).
+
+        :param kwargs: The dict of key-value arguments to check for the \
+            datetime value.
+        :type kwargs: Any (but is really dict[str, Any])
+
+        :param date_key: The key in ``kwargs`` that corresponds to the \
+            datetime value to check.
+        :type date_key: str
+
+        :param error_message: The error message to raise if the datetime value \
+            is not between ``min_dt`` and ``max_dt``.
+        :type error_message: str
+
+        :param min_dt: The earliest possible datetime value.
+        :type min_dt: datetime
+
+        :param max_dt: The latest possible datetime value. If None, then \
+            implies now datetime. Defaults to None.
+        :type max_dt: datetime or None
+
+        :raises ValueError: The datetime value is not between ``min_dt`` and \
+            ``max_dt``.
+
+        :return: None
+        """
+        if date_key in kwargs:
+            dt: datetime | date = kwargs[date_key]
+            if not is_datetime_between_range(
+                dt=dt if isinstance(dt, datetime) and not isinstance(dt, date) \
+                    else datetime_as_sgt(datetime(dt.year, dt.month, dt.day)),
+                min_dt=min_dt,
+                max_dt=max_dt,
+            ):
+                raise ValueError(error_message)
 
     @staticmethod
     @typechecked
