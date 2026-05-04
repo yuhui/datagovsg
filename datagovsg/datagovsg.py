@@ -20,11 +20,14 @@ from typing import Any
 from requests import codes as requests_codes
 from requests.adapters import HTTPAdapter, Retry
 from requests_cache import BaseCache, CachedSession
-from typeguard import check_type, typechecked
+from typeguard import check_type, typechecked, TypeCheckError
 
 from .constants import CACHE_NAME, USER_AGENT
 from .exceptions import APIError
-from .timezone import datetime_from_string
+from .timezone import (
+    datetime_from_string,
+    datetime_to_string,
+)
 from .types import Url
 
 class DataGovSg:
@@ -133,12 +136,9 @@ class DataGovSg:
 
             # Convert date and datetime to ISO format strings
             # Leave all other types as-is
-            # IMPORTANT! Test for `datetime` before `date`!
-            if isinstance(value, datetime):
-                params[param_key] = value.strftime('%Y-%m-%dT%H:%M:%S')
-            elif isinstance(value, date):
-                params[param_key] = value.strftime('%Y-%m-%d')
-            else:
+            try:
+                params[param_key] = datetime_to_string(value)
+            except TypeCheckError:
                 params[param_key] = value
 
         return params

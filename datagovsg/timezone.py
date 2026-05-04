@@ -127,6 +127,22 @@ def datetime_from_string(val: str) -> datetime | date | time:
 
     return dt
 
+@typechecked
+def datetime_to_string(dt: datetime | date) -> str:
+    """Convert a datetime to string.
+
+    :param dt: Datetime to convert to string.
+    :type dt: datetime or date
+
+    :return: The datetime as a string in ISO format.
+    :rtype: str
+    """
+    # IMPORTANT! Test for `datetime` before `date`!
+    val: str = dt.strftime('%Y-%m-%dT%H:%M:%S') if isinstance(dt, datetime) \
+        else dt.strftime('%Y-%m-%d')
+    return val
+
 __all__ = [
     'datetime_from_string',
+    'datetime_to_string',
 ]
