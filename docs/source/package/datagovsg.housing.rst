@@ -9,8 +9,9 @@ Example usage:
 
     # get the list of available car park spaces
     from datagovsg import Housing
+    from datagovsg.housing.types import CarparkAvailabilityItemDict
     housing = Housing()
-    carpark_availability = housing.carpark_availability()
+    carpark_availability: list[CarparkAvailabilityItemDict] = housing.carpark_availability()
 
 Methods
 -------

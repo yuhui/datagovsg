@@ -9,8 +9,9 @@ Example usage:
 
     # get the list of available taxis
     from datagovsg import Transport
+    from datagovsg.transport.types import TaxiAvailabilityDict
     transport = Transport()
-    taxi_availability = transport.taxi_availability()
+    taxi_availability: TaxiAvailabilityDict = transport.taxi_availability()
 
 Methods
 -------
