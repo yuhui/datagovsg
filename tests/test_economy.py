@@ -16,33 +16,42 @@
 
 """Test that the Economy class is working properly."""
 
+from datetime import date
 from os import getenv
+from unittest.mock import Mock
 
 import pytest
 from dotenv import load_dotenv
+from requests_cache import CachedSession
 from typeguard import check_type
 
 from datagovsg import Economy
-from datagovsg.economy.types import (
-    DesignsDict,
-    PatentsDict,
-    TrademarksDict,
+from datagovsg.economy.constants import INVALID_DATE_ERROR_MESSAGE
+from datagovsg.economy.types import EconomyDict
+
+from .mocks.api_response_economy import (
+    APIResponseDesigns,
+    APIResponsePatents,
+    APIResponseTrademarks,
 )
 
-TEST_PARAMETERS = [
-    ('designs', DesignsDict),
-    ('patents', PatentsDict),
-    ('trademarks', TrademarksDict),
+BAD_DATE = date(2000, 1, 1)
+GOOD_DATE = date(2020, 1, 12)
+GOOD_DATE_STRING = GOOD_DATE.strftime('%Y-%m-%d')
+
+TEST_DATA = [
+    ('designs', EconomyDict, APIResponseDesigns),
+    ('patents', EconomyDict, APIResponsePatents),
+    ('trademarks', EconomyDict, APIResponseTrademarks),
 ]
-
-"""
-The API endpoint is poorly documented, so skip the tests for specific dates.
-Anyway, it seems that the endpoint always returns 0 results, so maybe it's not
-working properly in the first place. __shrug shoulders__
-
-from datetime import date
-LODGEMENT_DATE = date(2025, 1, 12)
-"""
+TEST_METHODS = [method for method, _, _ in TEST_DATA]
+TEST_METHODS_AND_EXPECTED_TYPES = [
+    (method, expected_type) for method, expected_type, _ in TEST_DATA
+]
+TEST_METHODS_AND_MOCK_RESPONSE_METHODS = [
+    (method, mock_response_method) \
+        for method, _, mock_response_method in TEST_DATA
+]
 
 @pytest.fixture(scope='module')
 def client():
@@ -52,9 +61,43 @@ def client():
 
 @pytest.mark.parametrize(
     ('method', 'expected_type'),
-    TEST_PARAMETERS,
+    TEST_METHODS_AND_EXPECTED_TYPES,
 )
 def test_economy_methods(client, method, expected_type):
-    data = getattr(client, method, None)()
+    data = getattr(client, method, None)(lodgement_date=GOOD_DATE)
 
     assert check_type(data, expected_type) == data
+
+@pytest.mark.parametrize(
+    ('method', 'mock_response_method'),
+    TEST_METHODS_AND_MOCK_RESPONSE_METHODS,
+)
+def test_economy_methods_with_good_date(
+    client,
+    method,
+    mock_response_method,
+    monkeypatch,
+):
+    def mock_requests_get(*args, **kwargs):
+        return mock_response_method()
+
+    monkeypatch.setattr(CachedSession, 'get', mock_requests_get)
+
+    original_send_request = client.send_request
+    client.send_request = Mock(side_effect=original_send_request)
+
+    try:
+        _ = getattr(client, method, None)(lodgement_date=GOOD_DATE)
+    except ValueError as excinfo:
+        pytest.fail(f'Unexpected ValueError raised: {excinfo}')
+
+    client.send_request.assert_called_once()
+    _, kwargs = client.send_request.call_args
+    assert kwargs['params']['lodgement_date'] == GOOD_DATE_STRING
+
+@pytest.mark.parametrize('method', TEST_METHODS)
+def test_economy_methods_with_bad_date(client, method):
+    with pytest.raises(ValueError) as excinfo:
+        _ = getattr(client, method, None)(lodgement_date=BAD_DATE)
+
+    assert str(excinfo.value) == INVALID_DATE_ERROR_MESSAGE

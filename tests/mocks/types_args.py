@@ -23,6 +23,7 @@ class MockArgsDict(TypedDict):
     date: date
     datetime: datetime
     meaning_of_universe: NotRequired[int]
+    none_value: NotRequired[None]
 
 __all__ = [
     'MockArgsDict',
